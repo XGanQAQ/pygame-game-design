@@ -1,7 +1,7 @@
-# LearnTestGame
+# pygame-game-design
 
 ## 项目简介
-LearnTestGame 是一个基于 Pygame 的简单游戏框架，旨在帮助开发者快速上手游戏开发。框架提供了基本的游戏循环、玩家对象模板以及工具函数，便于扩展和定制。
+pygame-game-design 是一个基于 Pygame 的简单游戏框架，专为游戏策划课程的大作业设计的原型开发工具。框架旨在帮助开发者快速构建游戏原型，提供了基本的游戏循环、玩家对象模板以及工具函数，便于扩展和定制。
 
 ## 文件结构
 - **main.py**  
@@ -43,3 +43,20 @@ LearnTestGame 是一个基于 Pygame 的简单游戏框架，旨在帮助开发�
 2. 克隆项目到本地：
    ```bash
    git clone <repository-url>
+   ```
+3. 安装依赖：
+   ```bash
+   pip install pygame
+   ```
+4. 运行游戏：
+   ```bash
+   python main.py
+   ```
+
+## 适用场景
+- 游戏策划课程的原型开发。
+- 学习和实践 Pygame 的基础知识。
+- 快速搭建 2D 游戏框架，便于扩展和定制。
+
+## 参考
+- [Pygame 官方文档](https://www.pygame.org/docs/)
