@@ -1,4 +1,5 @@
 import pygame
+import gameObject
 from game import Game
 
 if __name__ == "__main__":

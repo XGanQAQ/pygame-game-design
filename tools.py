@@ -4,9 +4,11 @@ import pygame as pg
 main_dir = os.path.split(os.path.abspath(__file__))[0]
 
 def load_image(file):
-    """loads an image, prepares it for play"""
-    """执行的路径为~/assets/images/file"""
-    """所以直接传入文件名即可"""
+    """
+    loads an image, prepares it for play
+    执行的路径为~/assets/images/file
+    所以直接传入文件名即可
+    """
     file = os.path.join(main_dir, "assets/images", file)
     try:
         surface = pg.image.load(file)
@@ -16,9 +18,12 @@ def load_image(file):
 
 
 def load_sound(file):
-    """because pygame can be compiled without mixer."""
-    """执行的路径为~/assets/musics/file"""
-    """所以直接传入文件名即可"""
+    """
+    because pygame can be compiled without mixer.
+    执行的路径为~/assets/musics/file
+    所以直接传入文件名即可
+    """
+
     if not pg.mixer:
         return None
     file = os.path.join(main_dir, "assets/musics", file)

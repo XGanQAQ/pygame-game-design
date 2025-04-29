@@ -1,9 +1,13 @@
-import pygame
-from gameObject.player import Player
-from pygame.math import Vector2
-from gameObject.SpriteSheet import SpriteSheet
-import tools
 from typing import List, Dict, Optional, Union
+import pygame
+from pygame.math import Vector2
+
+from gameObject.player import Player
+from gameObject.snake_grid import SnakeGrid
+from gameObject.sprite_sheet import SpriteSheet
+from gameObject.gridmap import Gridmap
+
+import tools
 
 class Game:
     def __init__(self, screen_size):
@@ -16,9 +20,8 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
 
-    def init_game_objects(self, player_pos):
-        self.player = Player(player_pos, image=None)
-
+    def init_game_objects(self, player_pos:Vector2):
+        self.snake_grid = SnakeGrid(20, 20) # 创建一个20x20的网格
 
     def run(self):
         while self.running:
@@ -36,14 +39,14 @@ class Game:
 
     def update(self, delta_time):
         # 更新玩家位置
-        self.player.update(delta_time)
+        self.snake_grid.update()
 
     def draw(self):
         # 清空屏幕
         self.screen.fill("white")
 
-        # 绘制玩家
-        self.player.draw(self.screen)
+        # 绘制网格
+        self.snake_grid.draw(self.screen)
 
     def quit(self):
         pygame.quit()
