@@ -30,6 +30,9 @@ class SnakeGrid(Gridmap):
         self.move_snake(self.direction, item_grid, enemy_grid)
 
     def draw(self, screen):
+        """
+
+        """
         for i in range(self.grid_height):
             for j in range(self.grid_width):
                 cell_value = self.get_cell(j, i)
@@ -69,7 +72,7 @@ class SnakeGrid(Gridmap):
         # Check item collision
         if item_grid and item_grid.get_cell(new_head.x, new_head.y) == 50:  # Apple
             self.add_snake_body()
-            item_grid.set_cell(new_head.x, new_head.y, 31)
+            item_grid.set_cell(new_head.x, new_head.y, 0)
 
         # Check enemy collision
         if enemy_grid and enemy_grid.get_cell(new_head.x, new_head.y) > 0:
