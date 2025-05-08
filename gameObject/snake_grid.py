@@ -17,7 +17,10 @@ class SnakeGrid(Gridmap):
         self.cell_size = 20
         self.set_snake_head(self.snake_head.x, self.snake_head.y)
 
-    def update(self, keys, item_grid=None, enemy_grid=None):
+        self.is_enable_falling = False  # 是否允许掉落
+        self.is_falling = False  # 是否正在掉落
+
+    def update(self, keys, plat_grid=None, item_grid=None, enemy_grid=None):
         if keys[pygame.K_LEFT]:
             self.direction = IntVector2(-1, 0)
         elif keys[pygame.K_RIGHT]:
@@ -27,7 +30,13 @@ class SnakeGrid(Gridmap):
         elif keys[pygame.K_DOWN]:
             self.direction = IntVector2(0, 1)
 
-        self.move_snake(self.direction, item_grid, enemy_grid)
+        # 如果允许掉落，则开启掉落
+        if self.is_enable_falling:
+            self.fall(plat_grid)
+
+        # 如果不处于掉落状态，则可以移动蛇
+        if not self.is_falling:
+            self.move_snake(self.direction, plat_grid, item_grid, enemy_grid)
 
     def draw(self, screen):
         """
@@ -56,7 +65,7 @@ class SnakeGrid(Gridmap):
         self.set_cell(new_head.x, new_head.y, 31)
         self.snake_head = new_head
 
-    def move_snake(self, direction: IntVector2, item_grid=None, enemy_grid=None):
+    def move_snake(self, direction: IntVector2, plat_grid=None, item_grid=None, enemy_grid=None):
         new_head = self.snake_head + direction
 
         # Check boundaries
@@ -69,15 +78,30 @@ class SnakeGrid(Gridmap):
             print("Game Over! Self-collision.")
             return
 
+        # Check platform collision
+        if plat_grid:
+            value = plat_grid.get_cell(new_head.x, new_head.y)
+            if value == 0: # Empty space
+                pass
+            elif value == 10: # Platform
+                return
+            elif value == 20: # 尖刺
+                print("Game Over! Hit 尖刺.")
+                return
+
         # Check item collision
-        if item_grid and item_grid.get_cell(new_head.x, new_head.y) == 50:  # Apple
-            self.add_snake_body()
-            item_grid.set_cell(new_head.x, new_head.y, 0)
+        if item_grid:
+            value = item_grid.get_cell(new_head.x, new_head.y)
+            if value == 50: # Apple
+                self.add_snake_body()
+                item_grid.set_cell(new_head.x, new_head.y, 0)
 
         # Check enemy collision
-        if enemy_grid and enemy_grid.get_cell(new_head.x, new_head.y) > 0:
-            print("Game Over! Hit enemy.")
-            return
+        if enemy_grid:
+            value = enemy_grid.get_cell(new_head.x, new_head.y)
+            if value == 40:
+                print("Game Over! Hit enemy.")
+                return
 
         # Update snake body
         if self.snake_body_length > 0:
@@ -101,10 +125,23 @@ class SnakeGrid(Gridmap):
         self.snake_body_length += 1
 
     def fall(self, plat_grid: Gridmap):
+        self.is_falling = False
+        # check falling condition
+        # 如果没有平台网格，则不进行掉落
         if not plat_grid:
             return
+        # 检测所有蛇头和蛇身下方是否有平台
+        # 如果有平台，则不掉落
         for segment in [self.snake_head] + self.snake_body:
-            if segment.y + 1 < self.grid_height and plat_grid.get_cell(segment.x, segment.y + 1) == 0:
-                self.set_cell(segment.x, segment.y, 0)
-                segment.y += 1
-                self.set_cell(segment.x, segment.y, 31 if segment == self.snake_head else 30)
+            # 获得当前格子下方的值
+            value = plat_grid.get_cell(segment.x, segment.y + 1)
+            if segment.y + 1 < self.grid_height and (value == 10 or value == 11 or value == 12 or value == 20):
+                return
+        
+        # fall down
+        self.is_falling = True
+        # 掉落逻辑
+        for segment in [self.snake_head] + self.snake_body:
+            self.set_cell(segment.x, segment.y, 0)
+            segment.y += 1
+            self.set_cell(segment.x, segment.y, 31 if segment == self.snake_head else 30)

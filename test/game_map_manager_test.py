@@ -20,11 +20,13 @@ def main():
 
     # Add some initial objects
     for i in range(grid_width-5):
-        game_map_manager.plat_grid.set_ground(i, 15)
+        game_map_manager.plat_grid.set_ground(i, 25)
     game_map_manager.item_grid.set_apple(6, 10)
     game_map_manager.enemy_grid.set_patrol_enemy(7, 10)
 
     game_map_manager.is_rolling = True  # Start rolling
+    game_map_manager.set_snake_is_enable_falling(True)  # Enable falling for the snake
+
     running = True
     while running:
         keys = pygame.key.get_pressed()

@@ -25,7 +25,7 @@ class GameMapManager:
         """
         更新所有层级的地图状态。
         """
-        self.snake_grid.update(keys, item_grid=self.item_grid, enemy_grid=self.enemy_grid)
+        self.snake_grid.update(keys,plat_grid=self.plat_grid ,item_grid=self.item_grid, enemy_grid=self.enemy_grid)
         self.enemy_grid.update(player_pos=(self.snake_grid.snake_head.x, self.snake_grid.snake_head.y))
         self.plat_grid.update()
 
@@ -68,3 +68,9 @@ class GameMapManager:
                 grid.set_cell(x, y, grid.get_cell(x, y - 1))
         for x in range(self.width):
             grid.set_cell(x, 0, 0)
+
+    def set_snake_is_enable_falling(self, is_enable_falling:bool):
+        """
+        设置蛇是否允许掉落。
+        """
+        self.snake_grid.is_enable_falling = is_enable_falling
