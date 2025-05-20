@@ -9,7 +9,7 @@ def main():
     pygame.init()
     screen_width, screen_height = 800, 800
     cell_size = 20
-    grid_width, grid_height = screen_width // cell_size, screen_height // cell_size
+    grid_width, grid_height = screen_width // cell_size, screen_height // cell_size # 40x40 grid
 
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption("GameMapManager Test")
@@ -19,12 +19,22 @@ def main():
     game_map_manager = GameMapManager(grid_width, grid_height)
 
     # Add some initial objects
+    for i in range(grid_width-15):
+        game_map_manager.plat_grid.set_ground(i, 15)
+
+    for i in range(grid_width-10):
+        game_map_manager.plat_grid.set_ground(i, 18)
+
     for i in range(grid_width-5):
-        game_map_manager.plat_grid.set_ground(i, 25)
-    game_map_manager.item_grid.set_apple(6, 10)
+        game_map_manager.plat_grid.set_ground(i, 21)
+
+    game_map_manager.item_grid.set_apple(6, 20)
+    game_map_manager.item_grid.set_apple(7, 20)
+    game_map_manager.item_grid.set_apple(8, 20)
+
     game_map_manager.enemy_grid.set_patrol_enemy(7, 10)
 
-    game_map_manager.is_rolling = True  # Start rolling
+    game_map_manager.is_rolling = False  # Start rolling
     game_map_manager.set_snake_is_enable_falling(True)  # Enable falling for the snake
 
     running = True
