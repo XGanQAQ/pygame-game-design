@@ -10,9 +10,9 @@ class ItemGrid(Gridmap):
     52 代表无敌星星
     53 代表加速药水
     """
-    def __init__(self, width, height):
+    def __init__(self, width, height, cell_size=20):
         super().__init__(width, height)
-        self.cell_size = 20  # 单元格大小
+        self.cell_size = cell_size  # 单元格大小
 
     def draw(self, screen):
         """

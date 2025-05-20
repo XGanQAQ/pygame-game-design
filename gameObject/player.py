@@ -13,13 +13,15 @@ class Player(pygame.sprite.Sprite):  # 继承 Sprite 类
 
     def update(self, sender, delta_time):
         """
-        更新玩家状态（如果需要）
+        更新玩家状态（支持键盘和鼠标控制）
         :param sender: 信号发送者
         :param delta_time: 时间增量（秒）
         """
         keys = pygame.key.get_pressed()
+        mouse_buttons = pygame.mouse.get_pressed()
         direction = Vector2(0, 0)
 
+        # 键盘控制
         if keys[pygame.K_LEFT]:
             direction.x -= 1
         if keys[pygame.K_RIGHT]:
@@ -28,6 +30,11 @@ class Player(pygame.sprite.Sprite):  # 继承 Sprite 类
             direction.y -= 1
         if keys[pygame.K_DOWN]:
             direction.y += 1
+
+        # 鼠标控制（左键按下时移动到鼠标位置）
+        if mouse_buttons[0]:  # 左键
+            mouse_pos = Vector2(pygame.mouse.get_pos())
+            direction = (mouse_pos - Vector2(self.rect.center)).normalize()
 
         if direction.length() > 0:
             direction.scale_to_length(1)

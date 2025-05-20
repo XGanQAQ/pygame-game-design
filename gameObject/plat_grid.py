@@ -11,9 +11,9 @@ class PlatGrid(Gridmap):
         - 12 代表移动平台
     20 代表尖刺
     """
-    def __init__(self, width, height):
+    def __init__(self, width, height, cell_size=20):
         super().__init__(width, height)
-        self.cell_size = 20  # 单元格大小
+        self.cell_size = cell_size  # 单元格大小
 
     def update(self):
         """

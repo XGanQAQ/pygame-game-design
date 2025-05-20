@@ -1,2 +1,6 @@
 .venv
+/build
+/dist
+game_map_manager_test.spec
+test_main*
 __pycache__
