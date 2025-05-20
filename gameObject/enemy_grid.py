@@ -10,9 +10,9 @@ class EnemyGrid(Gridmap):
     41 代表飞行敌人
     42 代表追踪敌人
     """
-    def __init__(self, width, height):
+    def __init__(self, width, height, cell_size=20):
         super().__init__(width, height)
-        self.cell_size = 20  # 单元格大小
+        self.cell_size = cell_size  # 单元格大小
 
     def update(self, player_pos):
         """

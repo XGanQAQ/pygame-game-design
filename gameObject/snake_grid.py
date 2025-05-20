@@ -6,7 +6,7 @@ from gameObject.int_vector2 import IntVector2
 import pygame
 
 class SnakeGrid(Gridmap):
-    def __init__(self, width, height):
+    def __init__(self, width, height, cell_size=20):
         super().__init__(width, height)
         self.snake_body_length: int = 0
         self.direction = IntVector2(1, 0)  # Initial direction: right
@@ -14,7 +14,7 @@ class SnakeGrid(Gridmap):
         self.snake_body: List[IntVector2] = []
         self.snake_head_image = None
         self.snake_body_image = None
-        self.cell_size = 20
+        self.cell_size = cell_size
         self.set_snake_head(self.snake_head.x, self.snake_head.y)
 
         self.is_enable_falling = False  # 是否允许掉落
