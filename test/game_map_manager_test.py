@@ -15,7 +15,7 @@ def main():
 
     # Initialize GameMapManager
     game_map_manager = GameMapManager()
-    game_map_manager.load_level("example/level_example40x40.txt")  # Load the test level
+    game_map_manager.load_level("level/level_example40x40.txt")  # Load the test level
 
     game_map_manager.is_rolling = False  # Start rolling
     game_map_manager.set_snake_is_enable_falling(True)  # Enable falling for the snake
