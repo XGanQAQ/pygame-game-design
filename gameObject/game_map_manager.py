@@ -4,8 +4,9 @@ from gameObject.snake_grid import SnakeGrid
 from gameObject.enemy_grid import EnemyGrid
 from gameObject.item_grid import ItemGrid
 from gameObject.level_loader import LevelLoader
+from gameObject.game_object import GameObject
 
-class GameMapManager:
+class GameMapManager(GameObject):
     """
     统筹管理所有层级的地图，包括平台层、玩家层、敌人层、物品层。
     """
@@ -24,24 +25,27 @@ class GameMapManager:
         self.roll_count = 0 # 滚动计数器
         self.roll_speed = 10  # 滚动速度，每多少次update滚动一次，所以数值越大越慢
 
-    def update(self, keys):
+    def update(self, sender, **kwargs):
         """
         更新所有层级的地图状态。
         """
-        self.snake_grid.update(keys,plat_grid=self.plat_grid ,item_grid=self.item_grid, enemy_grid=self.enemy_grid)
+        keys = kwargs.get("keys", None)
+        delta_time = kwargs.get("delta_time", 0)
+        self.snake_grid.update(keys, plat_grid=self.plat_grid, item_grid=self.item_grid, enemy_grid=self.enemy_grid)
         self.enemy_grid.update(player_pos=(self.snake_grid.snake_head.x, self.snake_grid.snake_head.y))
         self.plat_grid.update()
-
         self.roll()  # 更新滚动状态
 
-    def draw(self, screen):
+    def draw(self, sender, **kwargs):
         """
         绘制所有层级的地图。
         """
-        self.plat_grid.draw(screen)
-        self.item_grid.draw(screen)
-        self.enemy_grid.draw(screen)
-        self.snake_grid.draw(screen)
+        screen = kwargs.get("screen", None)
+        if screen:
+            self.plat_grid.draw(screen)
+            self.item_grid.draw(screen)
+            self.enemy_grid.draw(screen)
+            self.snake_grid.draw(screen)
 
     def roll(self):
         """

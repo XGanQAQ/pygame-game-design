@@ -7,6 +7,7 @@ from gameObject.player import Player
 from gameObject.snake_grid import SnakeGrid
 from gameObject.sprite_sheet import SpriteSheet
 from gameObject.gridmap import Gridmap
+from gameObject.game_object import GameObject
 
 from enum import Enum
 
@@ -30,13 +31,13 @@ class Game:
             cls._instance = super(Game, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, screen_size):
+    def __init__(self, screen_size: Union[tuple, Vector2] = (1600, 900)):
         if not hasattr(self, "initialized"):  # 防止重复初始化
             pygame.init()
             self.screen = pygame.display.set_mode(screen_size)  # 设置窗口大小
             pygame.display.set_caption("Game Window")  # 设置窗口标题
             pygame.display.set_icon(pygame.image.load("assets/images/icon.png"))  # 设置窗口图标
-            self.screen.fill("white")  # 填充背景颜色
+            self.screen.fill("black")  # 填充背景颜色
 
             self.clock = pygame.time.Clock()
             self.running = True
@@ -62,25 +63,40 @@ class Game:
             pygame.display.flip()  # 更新整个屏幕的显示内容
             self.__handle_events()
 
+    def addGameObject(self, game_object):
+        """
+        添加游戏对象，将其信号添加到游戏循环中。
+        """
+        if isinstance(game_object, GameObject):
+            self.signals[LifeCycle.INIT].connect(game_object.init)  # 连接初始化信号
+            self.signals[LifeCycle.UPDATE].connect(game_object.update)
+            self.signals[LifeCycle.DRAW].connect(game_object.draw)
+        else:
+            raise TypeError("The game_object must be an instance of GameObject.")
+
+
     def __handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # 点击×关闭窗口
                 self.running = False
                 self.signals[LifeCycle.QUIT].send(self)  # 触发退出信号
-                self.__quit()
+                self.quit()
                 return  # 确保退出后不再继续执行
 
     def __update(self, delta_time):
-        # 触发更新信号
-        self.signals[LifeCycle.UPDATE].send(self, delta_time=delta_time)
+        # 获取键盘输入状态
+        keys = pygame.key.get_pressed()
+
+        # 触发更新信号，并传递键盘输入状态和时间增量
+        self.signals[LifeCycle.UPDATE].send(self, delta_time=delta_time, keys=keys)
 
     def __draw(self):
         # 清空屏幕
-        self.screen.fill("white")
+        self.screen.fill("black")
 
-        # 触发绘制信号
+        # 触发绘制信号，并传递屏幕对象
         self.signals[LifeCycle.DRAW].send(self, screen=self.screen)
 
-    def __quit(self):
+    def quit(self):
         pygame.quit()
         self.running = False  # 确保主循环不会继续运行

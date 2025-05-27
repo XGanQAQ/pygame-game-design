@@ -30,7 +30,7 @@ game = Game((800, 600))  # 设置屏幕大小
 game.signals["on_game_init"].connect(initialize_player)
 
 # 初始化游戏对象
-game.init_game_objects()
+game.__init_game_objects()
 
 # 运行游戏
 game.run()

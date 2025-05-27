@@ -4,6 +4,9 @@ import pygame
 from pygame.locals import QUIT, KEYDOWN, K_ESCAPE
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from gameObject.game_map_manager import GameMapManager
+"""
+此测试已经失效
+"""
 
 def main():
     pygame.init()
