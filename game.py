@@ -8,7 +8,19 @@ from gameObject.snake_grid import SnakeGrid
 from gameObject.sprite_sheet import SpriteSheet
 from gameObject.gridmap import Gridmap
 
+from enum import Enum
+
 import tools
+
+
+class LifeCycle(Enum):
+    INIT = "init"  # 初始化
+    UPDATE = "update"  # 更新
+    DRAW = "draw"  # 绘制
+    QUIT = "quit"  # 退出
+    GAME_OVER = "game_over"  # 游戏结束
+    GAME_START = "game_start"  # 游戏开始
+    GAME_PAUSE = "game_pause"  # 游戏暂停
 
 class Game:
     _instance = None  # 用于存储单例实例
@@ -31,16 +43,16 @@ class Game:
 
             # 初始化信号
             self.signals = {
-                "on_game_init": Signal(),  # 初始化时触发
-                "on_update": Signal(),  # 每帧更新时触发
-                "on_draw": Signal(),    # 每帧绘制时触发
-                "on_quit": Signal()     # 退出时触发
+                LifeCycle.INIT: Signal(),  # 初始化时触发
+                LifeCycle.UPDATE: Signal(),  # 每帧更新时触发
+                LifeCycle.DRAW: Signal(),    # 每帧绘制时触发
+                LifeCycle.QUIT: Signal()     # 退出时触发
             }
             
             self.initialized = True  # 标记已初始化
 
     def init_game_objects(self):
-        self.signals["on_game_init"].send(self)  # 触发初始化信号
+        self.signals[LifeCycle.INIT].send(self)  # 触发初始化信号
 
     def run(self):
         while self.running:
@@ -54,20 +66,20 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # 点击×关闭窗口
                 self.running = False
-                self.signals["on_quit"].send(self)  # 触发退出信号
+                self.signals[LifeCycle.QUIT].send(self)  # 触发退出信号
                 self.quit()
                 return  # 确保退出后不再继续执行
 
     def update(self, delta_time):
         # 触发更新信号
-        self.signals["on_update"].send(self, delta_time=delta_time)
+        self.signals[LifeCycle.UPDATE].send(self, delta_time=delta_time)
 
     def draw(self):
         # 清空屏幕
         self.screen.fill("white")
 
         # 触发绘制信号
-        self.signals["on_draw"].send(self, screen=self.screen)
+        self.signals[LifeCycle.DRAW].send(self, screen=self.screen)
 
     def quit(self):
         pygame.quit()
