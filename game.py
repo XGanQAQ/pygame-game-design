@@ -51,36 +51,36 @@ class Game:
             
             self.initialized = True  # 标记已初始化
 
-    def init_game_objects(self):
+    def __init_game_objects(self):
         self.signals[LifeCycle.INIT].send(self)  # 触发初始化信号
 
     def run(self):
         while self.running:
             delta_time = self.clock.tick(60) / 1000.0  # 获取时间增量（秒）
-            self.update(delta_time)
-            self.draw()
+            self.__update(delta_time)
+            self.__draw()
             pygame.display.flip()  # 更新整个屏幕的显示内容
-            self.handle_events()
+            self.__handle_events()
 
-    def handle_events(self):
+    def __handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # 点击×关闭窗口
                 self.running = False
                 self.signals[LifeCycle.QUIT].send(self)  # 触发退出信号
-                self.quit()
+                self.__quit()
                 return  # 确保退出后不再继续执行
 
-    def update(self, delta_time):
+    def __update(self, delta_time):
         # 触发更新信号
         self.signals[LifeCycle.UPDATE].send(self, delta_time=delta_time)
 
-    def draw(self):
+    def __draw(self):
         # 清空屏幕
         self.screen.fill("white")
 
         # 触发绘制信号
         self.signals[LifeCycle.DRAW].send(self, screen=self.screen)
 
-    def quit(self):
+    def __quit(self):
         pygame.quit()
         self.running = False  # 确保主循环不会继续运行
