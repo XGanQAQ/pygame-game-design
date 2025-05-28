@@ -3,7 +3,7 @@ import gameObject.game_map_manager
 
 if __name__ == "__main__":
     # 创建游戏实例
-    game = Game((1600.0, 900.0))  # 屏幕大小和玩家初始位置
+    game = Game((800.0, 900.0))  # 屏幕大小和玩家初始位置
 
     try:
         gameMap = gameObject.game_map_manager.GameMapManager(cell_size=20)  # 创建地图管理器实例

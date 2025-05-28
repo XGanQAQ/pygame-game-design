@@ -14,6 +14,19 @@ class ItemGrid(Gridmap):
         super().__init__(width, height)
         self.cell_size = cell_size  # 单元格大小
         self.art_assets = {} # 新增：用于存放美术资源信息
+        self.item_effects_config = {
+            51: {'duration': 5000},  # 浮空药水: 持续时间
+            52: {'duration': 5000},  # 无敌星星: 持续时间
+            53: {'duration': 5000, 'multiplier': 0.5}  # 加速药水: 持续时间, 速度倍率
+        }
+
+    def get_item_effect_config(self, item_id: int):
+        """
+        根据物品ID获取其效果配置
+        :param item_id: 物品的ID
+        :return: 包含效果参数的字典，如果物品ID没有配置则返回None
+        """
+        return self.item_effects_config.get(item_id)
 
     def draw(self, screen):
         """

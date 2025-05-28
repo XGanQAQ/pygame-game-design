@@ -43,24 +43,17 @@ class SnakeGrid(Gridmap):
         self.is_falling = False  # 是否正在掉落
 
         # Float effect
-        self.float_effect_duration = 5000  # 浮空效果持续时间 (毫秒)
         self.float_effect_timer = 0  # 浮空效果计时器
         self.is_floating_effect_active = False # 浮空效果是否激活
 
         # Invincible effect
-        self.invincible_effect_duration = 5000  # 无敌效果持续时间 (毫秒)
         self.invincible_effect_timer = 0  # 无敌效果计时器
         self.is_invincible_effect_active = False # 无敌效果是否激活
 
         # Speed boost effect
-        self.speed_boost_effect_duration = 5000  # 加速效果持续时间 (毫秒)
         self.speed_boost_effect_timer = 0  # 加速效果计时器
         self.is_speed_boost_active = False  # 加速效果是否激活
-        self.speed_boost_multiplier = 0.5  # 速度增加50%
         self.original_move_speed = self.move_speed # 存储原始移动速度
-
-        # 
-        #self.__set_snake_head(self.snake_head.x, self.snake_head.y)
 
     def update(self, keys, delta_time, plat_grid=None, item_grid=None, enemy_grid=None):
         if keys[pygame.K_LEFT]:
@@ -187,24 +180,26 @@ class SnakeGrid(Gridmap):
         # Check item collision
         if item_grid:
             value = item_grid.get_cell(new_head.x, new_head.y)
+            item_config = item_grid.get_item_effect_config(value)
+
             if value == 50: # Apple
                 self.__add_snake_body()
                 item_grid.set_cell(new_head.x, new_head.y, 0)
-            if value == 51: # Float potion
+            elif value == 51 and item_config: # Float potion
                 self.is_enable_falling = False
                 self.is_floating_effect_active = True
-                self.float_effect_timer = self.float_effect_duration
+                self.float_effect_timer = item_config['duration']
                 item_grid.set_cell(new_head.x, new_head.y, 0) # 移除药水
-            if value == 52: # Invincible star
+            elif value == 52 and item_config: # Invincible star
                 self.is_invincible_effect_active = True
-                self.invincible_effect_timer = self.invincible_effect_duration
+                self.invincible_effect_timer = item_config['duration']
                 item_grid.set_cell(new_head.x, new_head.y, 0) # 移除星星
-            if value == 53: # Speed boost potion
+            elif value == 53 and item_config: # Speed boost potion
                 if not self.is_speed_boost_active: # 只有在加速效果未激活时才保存原始速度
                     self.original_move_speed = self.move_speed
                 self.is_speed_boost_active = True
-                self.speed_boost_effect_timer = self.speed_boost_effect_duration
-                self.move_speed = self.original_move_speed * (1 + self.speed_boost_multiplier)
+                self.speed_boost_effect_timer = item_config['duration']
+                self.move_speed = self.original_move_speed * (1 + item_config['multiplier'])
                 item_grid.set_cell(new_head.x, new_head.y, 0) # 移除药水
 
         # Check enemy collision
