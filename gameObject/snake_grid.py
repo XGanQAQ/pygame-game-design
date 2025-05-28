@@ -47,6 +47,18 @@ class SnakeGrid(Gridmap):
         self.float_effect_timer = 0  # 浮空效果计时器
         self.is_floating_effect_active = False # 浮空效果是否激活
 
+        # Invincible effect
+        self.invincible_effect_duration = 5000  # 无敌效果持续时间 (毫秒)
+        self.invincible_effect_timer = 0  # 无敌效果计时器
+        self.is_invincible_effect_active = False # 无敌效果是否激活
+
+        # Speed boost effect
+        self.speed_boost_effect_duration = 5000  # 加速效果持续时间 (毫秒)
+        self.speed_boost_effect_timer = 0  # 加速效果计时器
+        self.is_speed_boost_active = False  # 加速效果是否激活
+        self.speed_boost_multiplier = 0.5  # 速度增加50%
+        self.original_move_speed = self.move_speed # 存储原始移动速度
+
         # 
         #self.__set_snake_head(self.snake_head.x, self.snake_head.y)
 
@@ -67,6 +79,21 @@ class SnakeGrid(Gridmap):
                 self.is_floating_effect_active = False
                 self.is_enable_falling = True  # 效果结束，恢复允许掉落
                 self.float_effect_timer = 0
+
+        # 更新无敌效果计时器
+        if self.is_invincible_effect_active:
+            self.invincible_effect_timer -= delta_time * 1000  # delta_time 是秒，转换为毫秒
+            if self.invincible_effect_timer <= 0:
+                self.is_invincible_effect_active = False
+                self.invincible_effect_timer = 0
+
+        # 更新加速效果计时器
+        if self.is_speed_boost_active:
+            self.speed_boost_effect_timer -= delta_time * 1000  # delta_time 是秒，转换为毫秒
+            if self.speed_boost_effect_timer <= 0:
+                self.is_speed_boost_active = False
+                self.move_speed = self.original_move_speed  # 恢复原始速度
+                self.speed_boost_effect_timer = 0
 
         # 如果允许掉落，则开启掉落
         if self.is_enable_falling:
@@ -152,9 +179,10 @@ class SnakeGrid(Gridmap):
             elif value == 10: # Platform
                 return
             elif value == 20: # 尖刺
-                self.snak_dead_signal.send(self)  # 发送蛇死亡信号
-                print("Game Over! Hit 尖刺.")
-                return
+                if not self.is_invincible_effect_active:
+                    self.snak_dead_signal.send(self)  # 发送蛇死亡信号
+                    print("Game Over! Hit 尖刺.")
+                    return
 
         # Check item collision
         if item_grid:
@@ -167,13 +195,25 @@ class SnakeGrid(Gridmap):
                 self.is_floating_effect_active = True
                 self.float_effect_timer = self.float_effect_duration
                 item_grid.set_cell(new_head.x, new_head.y, 0) # 移除药水
+            if value == 52: # Invincible star
+                self.is_invincible_effect_active = True
+                self.invincible_effect_timer = self.invincible_effect_duration
+                item_grid.set_cell(new_head.x, new_head.y, 0) # 移除星星
+            if value == 53: # Speed boost potion
+                if not self.is_speed_boost_active: # 只有在加速效果未激活时才保存原始速度
+                    self.original_move_speed = self.move_speed
+                self.is_speed_boost_active = True
+                self.speed_boost_effect_timer = self.speed_boost_effect_duration
+                self.move_speed = self.original_move_speed * (1 + self.speed_boost_multiplier)
+                item_grid.set_cell(new_head.x, new_head.y, 0) # 移除药水
 
         # Check enemy collision
         if enemy_grid:
             value = enemy_grid.get_cell(new_head.x, new_head.y)
             if value == 40:
-                print("Game Over! Hit enemy.")
-                return
+                if not self.is_invincible_effect_active:
+                    print("Game Over! Hit enemy.")
+                    return
 
         # Update snake body
         if self.snake_body_length > 0:
