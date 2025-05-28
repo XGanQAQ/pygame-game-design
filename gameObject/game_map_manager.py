@@ -31,7 +31,7 @@ class GameMapManager(GameObject):
         """
         keys = kwargs.get("keys", None)
         delta_time = kwargs.get("delta_time", 0)
-        self.snake_grid.update(keys, plat_grid=self.plat_grid, item_grid=self.item_grid, enemy_grid=self.enemy_grid)
+        self.snake_grid.update(keys, delta_time, plat_grid=self.plat_grid, item_grid=self.item_grid, enemy_grid=self.enemy_grid)
         self.enemy_grid.update(player_pos=(self.snake_grid.snake_head.x, self.snake_grid.snake_head.y))
         self.plat_grid.update()
         self.roll()  # 更新滚动状态
