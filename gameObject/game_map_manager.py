@@ -103,6 +103,27 @@ class GameMapManager(GameObject):
             for x, cell in enumerate(row):
                 if cell == 10:  # 不可穿透的地面
                     self.plat_grid.set_cell(x, y, 10)
+                elif cell == 20:  # 尖刺
+                    self.plat_grid.set_cell(x, y, 20)
+                elif cell == 30:  # 蛇身体
+                    #由于蛇身的添加依赖于蛇头，所以不能在这轮进行添加
+                    #其实可以计数，然后在循环结束后添加
+                    #self.snake_grid.__add_snake_body(x, y)
+                    pass
+                elif cell == 31:  # 蛇头
+                    self.snake_grid.set_snake_head(x, y)
+                elif cell == 40:  # 敌人
+                    self.enemy_grid.set_cell(x, y, 40)
                 elif cell == 50:  # 苹果
                     self.item_grid.set_cell(x, y, 50)
-                # 其他物体可以在此扩展
+                elif cell == 51:  # 浮空药水
+                    self.item_grid.set_cell(x, y, 51)
+                elif cell == 52:  # 无敌星星
+                    self.item_grid.set_cell(x, y, 52)
+                elif cell == 53:  # 加速药水
+                    self.item_grid.set_cell(x, y, 53)
+                elif cell == 0:  # 空白
+                    self.plat_grid.set_cell(x, y, 0)
+                    self.snake_grid.set_cell(x, y, 0)
+                    self.enemy_grid.set_cell(x, y, 0)
+                    self.item_grid.set_cell(x, y, 0)

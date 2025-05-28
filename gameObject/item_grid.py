@@ -13,6 +13,7 @@ class ItemGrid(Gridmap):
     def __init__(self, width, height, cell_size=20):
         super().__init__(width, height)
         self.cell_size = cell_size  # 单元格大小
+        self.art_assets = {} # 新增：用于存放美术资源信息
 
     def draw(self, screen):
         """

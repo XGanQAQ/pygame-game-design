@@ -2,12 +2,20 @@ from typing import List, Dict, Optional, Union
 from pygame import Vector2
 from gameObject.gridmap import Gridmap
 from gameObject.int_vector2 import IntVector2
+from blinker import Signal  # 引入 blinker 信号库
 
 import pygame
 
 class SnakeGrid(Gridmap):
     def __init__(self, width, height, cell_size=20):
         super().__init__(width, height)
+
+        # Singnal
+        self.snake_init_signal = Signal()  # 蛇初始化信号
+        self.snak_dead_signal = Signal()  # 蛇死亡信号
+        self.snake_grow_signal = Signal()  # 蛇生长信号
+
+        # Body Length
         self.snake_body_length: int = 0
 
         # Position and direction
@@ -34,8 +42,13 @@ class SnakeGrid(Gridmap):
         self.is_enable_falling = False  # 是否允许掉落
         self.is_falling = False  # 是否正在掉落
 
-        # Initialize the snake head and body in the grid
-        self.__set_snake_head(self.snake_head.x, self.snake_head.y)
+        # Float effect
+        self.float_effect_duration = 5000  # 浮空效果持续时间 (毫秒)
+        self.float_effect_timer = 0  # 浮空效果计时器
+        self.is_floating_effect_active = False # 浮空效果是否激活
+
+        # 
+        #self.__set_snake_head(self.snake_head.x, self.snake_head.y)
 
     def update(self, keys, delta_time, plat_grid=None, item_grid=None, enemy_grid=None):
         if keys[pygame.K_LEFT]:
@@ -46,6 +59,14 @@ class SnakeGrid(Gridmap):
             self.direction = IntVector2(0, -1)
         elif keys[pygame.K_DOWN]:
             self.direction = IntVector2(0, 1)
+
+        # 更新浮空效果计时器
+        if self.is_floating_effect_active:
+            self.float_effect_timer -= delta_time * 1000  # delta_time 是秒，转换为毫秒
+            if self.float_effect_timer <= 0:
+                self.is_floating_effect_active = False
+                self.is_enable_falling = True  # 效果结束，恢复允许掉落
+                self.float_effect_timer = 0
 
         # 如果允许掉落，则开启掉落
         if self.is_enable_falling:
@@ -90,7 +111,7 @@ class SnakeGrid(Gridmap):
     # 放置头的位置
     # 但是仅仅放置了头，没有把身体一同调整
     # 所有仅仅适用于初始化放置头
-    def __set_snake_head(self, x, y):
+    def set_snake_head(self, x, y):
         old_head = self.snake_head
         new_head = IntVector2(x, y)
         # 因为在蛇头单个移动的时候，蛇身的最后一个位置会被清除，所以这里需要判断一下
@@ -131,6 +152,7 @@ class SnakeGrid(Gridmap):
             elif value == 10: # Platform
                 return
             elif value == 20: # 尖刺
+                self.snak_dead_signal.send(self)  # 发送蛇死亡信号
                 print("Game Over! Hit 尖刺.")
                 return
 
@@ -140,6 +162,11 @@ class SnakeGrid(Gridmap):
             if value == 50: # Apple
                 self.__add_snake_body()
                 item_grid.set_cell(new_head.x, new_head.y, 0)
+            if value == 51: # Float potion
+                self.is_enable_falling = False
+                self.is_floating_effect_active = True
+                self.float_effect_timer = self.float_effect_duration
+                item_grid.set_cell(new_head.x, new_head.y, 0) # 移除药水
 
         # Check enemy collision
         if enemy_grid:
@@ -156,7 +183,7 @@ class SnakeGrid(Gridmap):
             self.set_cell(self.snake_body[0].x, self.snake_body[0].y, 30)
 
         # Update snake head
-        self.__set_snake_head(new_head.x, new_head.y)
+        self.set_snake_head(new_head.x, new_head.y)
 
     def __add_snake_body(self):
         if self.snake_body_length == 0:
