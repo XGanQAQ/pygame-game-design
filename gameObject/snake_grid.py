@@ -88,13 +88,13 @@ class SnakeGrid(Gridmap):
                 self.move_speed = self.original_move_speed  # 恢复原始速度
                 self.speed_boost_effect_timer = 0
 
-        # 如果允许掉落，则开启掉落
-        if self.is_enable_falling:
-            self.__fall(delta_time, plat_grid)
-
         # 如果不处于掉落状态并且满足移动需求逻辑，则可以移动蛇
         if not self.is_falling and self.__move_speed_logic(delta_time):
             self.__move_snake(self.direction, plat_grid, item_grid, enemy_grid)
+
+        # 如果允许掉落，则开启掉落
+        if self.is_enable_falling:
+            self.__fall(delta_time, plat_grid)
 
     def draw(self, screen):
         """
@@ -256,6 +256,8 @@ class SnakeGrid(Gridmap):
         self.is_falling = True
 
         for segment in [self.snake_head] + self.snake_body:
-            self.set_cell(segment.x, segment.y, 0)
-            segment.y += 1
-            self.set_cell(segment.x, segment.y, 31 if segment == self.snake_head else 30)
+            self.set_cell(segment.x, segment.y, 0)  # 擦除旧位置
+
+        for segment in [self.snake_head] + self.snake_body:
+            segment.y += 1  # 更新位置
+            self.set_cell(segment.x, segment.y, 31 if segment == self.snake_head else 30)  # 绘制新位置
