@@ -20,10 +20,10 @@ class GameMapManager(GameObject):
         self.enemy_grid = None  # 敌人层
         self.item_grid = None  # 物品层
 
-        self.is_rolling = False # 是否正在滚动
-        self.roll_total = 0 # 滚动总计数器
-        self.roll_count = 0 # 滚动计数器
-        self.roll_speed = 10  # 滚动速度，每多少次update滚动一次，所以数值越大越慢
+        self.is_rolling = False  # 是否正在滚动
+        self.roll_total = 0  # 滚动总计数器
+        self.roll_progress = 0.0  # 滚动进度(0.0-1.0)
+        self.roll_speed = 1.0  # 滚动速度(格/秒)
 
     def update(self, sender, **kwargs):
         """
@@ -34,7 +34,7 @@ class GameMapManager(GameObject):
         self.snake_grid.update(keys, delta_time, plat_grid=self.plat_grid, item_grid=self.item_grid, enemy_grid=self.enemy_grid)
         self.enemy_grid.update(player_pos=(self.snake_grid.snake_head.x, self.snake_grid.snake_head.y))
         self.plat_grid.update()
-        self.roll()  # 更新滚动状态
+        self.roll(delta_time)  # 更新滚动状态，传入delta_time
 
     def draw(self, sender, **kwargs):
         """
@@ -47,23 +47,31 @@ class GameMapManager(GameObject):
             self.enemy_grid.draw(screen)
             self.snake_grid.draw(screen)
 
-    def roll(self):
+    def roll(self, delta_time=0.0):
         """
         滚动所有层级的地图。
+        
+        Args:
+            delta_time: 距离上一次更新的时间(秒)
         """
-        if self.is_rolling==False:
+        if not self.is_rolling or delta_time <= 0:
             return
-
-        # 更新滚动逻辑
-        self.roll_count += 1
-        # 每roll_speed次update滚动一次
-        if self.roll_count >= self.roll_speed:
-            self.plat_grid.roll()
-            # 玩家层不滚动,因为玩家受fall控制，而不是滚动影响
-            self.enemy_grid.roll()
-            self.item_grid.roll()
-            self.roll_count = 0
-            self.roll_total += 1
+            
+        # 更新滚动进度
+        self.roll_progress += self.roll_speed * delta_time
+        
+        # 当进度达到或超过1.0时，执行滚动
+        while self.roll_progress >= 1.0:
+            self.perform_roll()
+            self.roll_progress -= 1.0
+    
+    def perform_roll(self):
+        """执行一次完整的滚动操作"""
+        self.plat_grid.roll()
+        # 玩家层不滚动,因为玩家受fall控制，而不是滚动影响
+        self.enemy_grid.roll()
+        self.item_grid.roll()
+        self.roll_total += 1
 
     def roll_grid(self, grid:Gridmap):
         """
@@ -81,10 +89,21 @@ class GameMapManager(GameObject):
         设置蛇是否允许掉落。
         """
         self.snake_grid.is_enable_falling = is_enable_falling
+        
+    def set_map_scrolling(self, enable: bool):
+        """
+        设置是否启用地图滚动。
+        
+        Args:
+            enable (bool): 是否启用地图滚动
+        """
+        self.is_rolling = enable
 
     def load_level(self, file_path):
         """
         加载关卡文件并初始化地图。
+        Args:
+            file_path (str): 关卡文件路径
         """
         level_loader = LevelLoader(file_path)
         level_loader.load_level()
