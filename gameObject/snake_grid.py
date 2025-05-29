@@ -22,6 +22,7 @@ class SnakeGrid(Gridmap):
         self.direction = IntVector2(1, 0)  # Initial direction: right
         self.snake_head = IntVector2(width // 2, height // 2)  # Start at center
         self.snake_body: List[IntVector2] = []
+        self.snake_tail: Optional[IntVector2] = None  # 蛇尾位置
 
         # Move Speed
         self.move_speed = 300  # Speed of the snake movement
@@ -98,8 +99,9 @@ class SnakeGrid(Gridmap):
 
     def draw(self, screen):
         """
-
+        Draw the snake on the screen with special tail color
         """
+        # First draw all body parts
         for i in range(self.grid_height):
             for j in range(self.grid_width):
                 cell_value = self.get_cell(j, i)
@@ -113,6 +115,13 @@ class SnakeGrid(Gridmap):
                         screen.blit(self.snake_head_image, (j * self.cell_size, i * self.cell_size))
                     else:
                         pygame.draw.rect(screen, (0, 200, 0), (j * self.cell_size, i * self.cell_size, self.cell_size, self.cell_size))
+        
+        # Then draw the tail with special color if it exists
+        if self.snake_tail and self.get_cell(self.snake_tail.x, self.snake_tail.y) == 30:
+            pygame.draw.rect(screen, (0, 150, 0), 
+                          (self.snake_tail.x * self.cell_size, 
+                           self.snake_tail.y * self.cell_size, 
+                           self.cell_size, self.cell_size))
 
     def set_move_speed(self, speed: float):
         """
@@ -216,6 +225,11 @@ class SnakeGrid(Gridmap):
             self.set_cell(tail.x, tail.y, 0)
             self.snake_body.insert(0, self.snake_head)
             self.set_cell(self.snake_body[0].x, self.snake_body[0].y, 30)
+            # 更新蛇尾位置为新的最后一个身体部分
+            self.snake_tail = self.snake_body[-1] if self.snake_body_length > 1 else self.snake_head
+        else:
+            # 如果没有身体，蛇尾就是蛇头
+            self.snake_tail = self.snake_head
 
         # Update snake head
         self.set_snake_head(new_head.x, new_head.y)
@@ -230,6 +244,8 @@ class SnakeGrid(Gridmap):
         self.snake_body.append(new_tail)
         self.set_cell(new_tail.x, new_tail.y, 30)
         self.snake_body_length += 1
+        # 更新蛇尾位置
+        self.snake_tail = new_tail
 
     def __fall(self, delta_time, plat_grid: Gridmap):
         # 控制掉落速度
