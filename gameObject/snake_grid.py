@@ -38,6 +38,7 @@ class SnakeGrid(Gridmap):
         self.cell_size = cell_size
         self.snake_head_image = None
         self.snake_body_image = None
+        self.snake_tail_image = None
 
         # Move and falling states
         self.is_enable_falling = False  # 是否允许掉落
@@ -116,12 +117,19 @@ class SnakeGrid(Gridmap):
                     else:
                         pygame.draw.rect(screen, (0, 200, 0), (j * self.cell_size, i * self.cell_size, self.cell_size, self.cell_size))
         
-        # Then draw the tail with special color if it exists
+        # Then draw the tail with special color or image if it exists
         if self.snake_tail and self.get_cell(self.snake_tail.x, self.snake_tail.y) == 30:
-            pygame.draw.rect(screen, (0, 150, 0), 
+            if hasattr(self, 'snake_tail_image') and self.snake_tail_image is not None:
+                # 如果有设置蛇尾图片，则使用图片
+                screen.blit(self.snake_tail_image, 
                           (self.snake_tail.x * self.cell_size, 
-                           self.snake_tail.y * self.cell_size, 
-                           self.cell_size, self.cell_size))
+                           self.snake_tail.y * self.cell_size))
+            else:
+                # 否则使用默认的绿色矩形
+                pygame.draw.rect(screen, (0, 150, 0), 
+                              (self.snake_tail.x * self.cell_size, 
+                               self.snake_tail.y * self.cell_size, 
+                               self.cell_size, self.cell_size))
 
     def set_move_speed(self, speed: float):
         """
@@ -140,6 +148,28 @@ class SnakeGrid(Gridmap):
     # 放置头的位置
     # 但是仅仅放置了头，没有把身体一同调整
     # 所有仅仅适用于初始化放置头
+    def set_snake_art(self, head_image: pygame.Surface = None, body_image: pygame.Surface = None, tail_image: pygame.Surface = None):
+        """
+        设置蛇的美术资源
+        :param head_image: 蛇头图片，必须是pygame.Surface对象
+        :param body_image: 蛇身图片，必须是pygame.Surface对象
+        :param tail_image: 蛇尾图片，必须是pygame.Surface对象。如果为None，则使用body_image或默认颜色
+        """
+        if head_image is not None:
+            if not isinstance(head_image, pygame.Surface):
+                raise TypeError("head_image must be a pygame.Surface object")
+            self.snake_head_image = head_image
+            
+        if body_image is not None:
+            if not isinstance(body_image, pygame.Surface):
+                raise TypeError("body_image must be a pygame.Surface object")
+            self.snake_body_image = body_image
+            
+        if tail_image is not None:
+            if not isinstance(tail_image, pygame.Surface):
+                raise TypeError("tail_image must be a pygame.Surface object")
+            self.snake_tail_image = tail_image
+
     def set_snake_head(self, x, y):
         old_head = self.snake_head
         new_head = IntVector2(x, y)
