@@ -31,13 +31,30 @@ class Game:
             cls._instance = super(Game, cls).__new__(cls)
         return cls._instance
 
+    def set_window_icon(self, icon_path: str = "assets/images/icon.png"):
+        """
+        设置窗口图标
+        :param icon_path: 图标文件路径
+        """
+        try:
+            icon = pygame.image.load(icon_path)
+            pygame.display.set_icon(icon)
+            return True
+        except pygame.error as e:
+            print(f"无法加载图标文件 {icon_path}: {e}")
+            return False
+
     def __init__(self, screen_size: Union[tuple, Vector2] = (1600, 900)):
         if not hasattr(self, "initialized"):  # 防止重复初始化
             pygame.init()
             self.screen = pygame.display.set_mode(screen_size)  # 设置窗口大小
             pygame.display.set_caption("Game Window")  # 设置窗口标题
-            pygame.display.set_icon(pygame.image.load("assets/images/icon.png"))  # 设置窗口图标
+            self.set_window_icon()  # 设置窗口图标
             self.screen.fill("black")  # 填充背景颜色
+            
+            # 背景图属性
+            self.background = None
+            self.background_rect = None
 
             self.clock = pygame.time.Clock()
             self.running = True
@@ -90,9 +107,30 @@ class Game:
         # 触发更新信号，并传递键盘输入状态和时间增量
         self.signals[LifeCycle.UPDATE].send(self, delta_time=delta_time, keys=keys)
 
+    def load_background(self, image_path: str):
+        """
+        加载游戏背景图
+        :param image_path: 背景图片的路径
+        """
+        try:
+            self.background = pygame.image.load(image_path).convert()
+            # 缩放背景图以匹配屏幕大小
+            self.background = pygame.transform.scale(self.background, self.screen.get_size())
+            self.background_rect = self.background.get_rect()
+            return True
+        except pygame.error as e:
+            print(f"无法加载背景图片 {image_path}: {e}")
+            self.background = None
+            self.background_rect = None
+            return False
+
     def __draw(self):
         # 清空屏幕
         self.screen.fill("black")
+        
+        # 绘制背景图（如果已加载）
+        if self.background:
+            self.screen.blit(self.background, self.background_rect)
 
         # 触发绘制信号，并传递屏幕对象
         self.signals[LifeCycle.DRAW].send(self, screen=self.screen)

@@ -10,6 +10,8 @@ if __name__ == "__main__":
         gameMap.load_level("level/level_test40x40.txt")
         gameMap.set_snake_is_enable_falling(True)  # 设置蛇允许掉落
         game.addGameObject(gameMap)  # 添加地图管理器
+        game.set_window_icon("assets/images/icon.png")
+        game.load_background("assets/images/back.png")
         game.run()  # 运行游戏
     finally:
         game.quit()  # 确保退出时清理资源
