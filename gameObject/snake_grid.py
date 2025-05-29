@@ -131,6 +131,55 @@ class SnakeGrid(Gridmap):
                                self.snake_tail.y * self.cell_size, 
                                self.cell_size, self.cell_size))
 
+    def roll(self):
+        """
+        滚动蛇层
+        先保存当前蛇的位置，然后清空整个网格，最后重新设置滚动后的位置
+        """
+        # 保存当前所有蛇身和头部的位置
+        snake_cells = []
+        head_at_bottom = False
+        
+        for y in range(self.grid_height):
+            for x in range(self.grid_width):
+                cell_value = self.get_cell(x, y)
+                if cell_value in [30, 31]:  # 蛇身或蛇头
+                    snake_cells.append((x, y, cell_value))
+                    # 检查蛇头是否在最底层
+                    if cell_value == 31 and y == self.grid_height - 1:
+                        head_at_bottom = True
+        
+        # 如果蛇头在最底层，触发死亡信号
+        if head_at_bottom:
+            self.snak_dead_signal.send(self)
+            return
+        
+        # 清空整个网格
+        self.clear()
+        
+        # 重新设置滚动后的位置
+        for x, y, cell_value in snake_cells:
+            new_y = y + 1  # 向下滚动一格
+            if new_y < self.grid_height:  # 如果新位置在网格内
+                self.set_cell(x, new_y, cell_value)
+                # 更新蛇头或蛇尾的引用
+                if cell_value == 31:  # 蛇头
+                    self.snake_head = IntVector2(x, new_y)
+                elif (x, y) == (self.snake_tail.x, self.snake_tail.y):  # 蛇尾
+                    self.snake_tail = IntVector2(x, new_y)
+            
+            # 更新蛇身列表中的位置
+            for i, pos in enumerate(self.snake_body):
+                if (pos.x, pos.y) == (x, y):
+                    if new_y < self.grid_height:
+                        self.snake_body[i] = IntVector2(x, new_y)
+                    else:
+                        # 如果蛇身移出网格，则从蛇身列表中移除
+                        self.snake_body.pop(i)
+                        if self.snake_body:  # 如果还有蛇身，更新蛇尾
+                            self.snake_tail = IntVector2(self.snake_body[-1].x, self.snake_body[-1].y)
+                        break
+
     def set_move_speed(self, speed: float):
         """
         设置蛇的移动速度

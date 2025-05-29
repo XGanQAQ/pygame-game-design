@@ -68,21 +68,10 @@ class GameMapManager(GameObject):
     def perform_roll(self):
         """执行一次完整的滚动操作"""
         self.plat_grid.roll()
-        # 玩家层不滚动,因为玩家受fall控制，而不是滚动影响
-        self.enemy_grid.roll()
         self.item_grid.roll()
+        self.snake_grid.roll()
+        self.enemy_grid.roll()
         self.roll_total += 1
-
-    def roll_grid(self, grid:Gridmap):
-        """
-        使网格的所有元素向下移动一格。
-        最底部的一行将被清空，顶部新增一行空白。
-        """
-        for y in range(self.height - 1, 0, -1):
-            for x in range(self.width):
-                grid.set_cell(x, y, grid.get_cell(x, y - 1))
-        for x in range(self.width):
-            grid.set_cell(x, 0, 0)
 
     def set_snake_is_enable_falling(self, is_enable_falling:bool):
         """
