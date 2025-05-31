@@ -8,15 +8,15 @@ from gameObject.level_loader import LevelLoader
 class TestLevelLoader(unittest.TestCase):
     def setUp(self):
         # 创建一个临时关卡文件内容
-        self.test_file_path = "test_level.txt"
+        self.test_file_path = "test_level.csv"
         with open(self.test_file_path, "w") as file:
             file.write("5\n")  # 宽度
             file.write("5\n")  # 高度
-            file.write("0 10 0 0 0\n")
-            file.write("0 0 50 0 0\n")
-            file.write("10 10 10 10 10\n")
-            file.write("0 0 0 0 0\n")
-            file.write("0 0 0 0 0\n")
+            file.write("0,10,0,0,0\n")
+            file.write("0,0,50,0,0\n")
+            file.write("10,10,10,10,10\n")
+            file.write("0,0,0,0,0\n")
+            file.write("0,0,0,0,0\n")
 
     def tearDown(self):
         # 删除临时文件
