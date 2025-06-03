@@ -135,6 +135,7 @@ class SnakeGrid(Gridmap):
         """
         滚动蛇层
         先保存当前蛇的位置，然后清空整个网格，最后重新设置滚动后的位置
+        (这样不会让先遍历的蛇身和蛇头覆盖后遍历的蛇身和蛇头)
         """
         # 保存当前所有蛇身和头部的位置
         snake_cells = []
@@ -227,6 +228,14 @@ class SnakeGrid(Gridmap):
             self.set_cell(old_head.x, old_head.y, 0)
         self.set_cell(new_head.x, new_head.y, 31)
         self.snake_head = new_head
+    
+    def init_find_snake_head(self):
+        for y in range(self.grid_height):
+            for x in range(self.grid_width):
+                if self.get_cell(x, y) == 31:
+                    self.snake_head = IntVector2(x, y)
+                    return IntVector2(x, y)
+        return None  
 
     def __move_speed_logic(self, delta_time):
         """

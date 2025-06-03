@@ -12,6 +12,7 @@ class GameMapManager(GameObject):
     """
     def __init__(self, cell_size=20):
         self.cell_size = cell_size  # 单元格大小
+        self.map_data = [] # 读取的关卡数据
 
         self.width = 0
         self.height = 0
@@ -62,15 +63,21 @@ class GameMapManager(GameObject):
         
         # 当进度达到或超过1.0时，执行滚动
         while self.roll_progress >= 1.0:
-            self.perform_roll()
+            new_row = self.map_data.pop(0) if self.map_data else [0] * self.width
+            self.__perform_roll(new_row)
             self.roll_progress -= 1.0
     
-    def perform_roll(self):
+    def __perform_roll(self, new_row=None):
         """执行一次完整的滚动操作"""
-        self.plat_grid.roll()
-        self.item_grid.roll()
+        plat_row = LevelLoader.filter_row_plat(new_row)
+        snake_row = LevelLoader.filter_row_snake(new_row)
+        enemy_row = LevelLoader.filter_row_enemy(new_row)
+        item_row = LevelLoader.filter_row_item(new_row)
+        
+        self.plat_grid.push(plat_row)
+        self.item_grid.push(item_row)
         self.snake_grid.roll()
-        self.enemy_grid.roll()
+        self.enemy_grid.push(enemy_row)
         self.roll_total += 1
 
     def set_snake_is_enable_falling(self, is_enable_falling:bool):
@@ -88,15 +95,16 @@ class GameMapManager(GameObject):
         """
         self.is_rolling = enable
 
-    def load_level(self, file_path):
+    def load_level(self, file_path, read_row_count):
         """
         加载关卡文件并初始化地图。
         Args:
             file_path (str): 关卡文件路径
+            read_row_count (int): 读取的行数，用于初始化地图
         """
         level_loader = LevelLoader(file_path)
         level_loader.load_level()
-        map_data = level_loader.get_map_data()
+        self.map_data = level_loader.get_map_data_reverse()
 
         self.width = level_loader.width
         self.height = level_loader.height
@@ -104,34 +112,27 @@ class GameMapManager(GameObject):
         self.snake_grid = SnakeGrid(self.width, self.height, cell_size=self.cell_size)
         self.enemy_grid = EnemyGrid(self.width, self.height, cell_size=self.cell_size)
         self.item_grid = ItemGrid(self.width, self.height, cell_size=self.cell_size)
+        
+        # 推入指定行数的数据
+        for _ in range(read_row_count):
+            if not self.map_data:
+                break
+                
+            row = self.map_data.pop(0)
+            
+            plat_row = LevelLoader.filter_row_plat(row)
+            snake_row = LevelLoader.filter_row_snake(row)
+            enemy_row = LevelLoader.filter_row_enemy(row)
+            item_row = LevelLoader.filter_row_item(row)
 
+            self.plat_grid.push(plat_row)
+            self.snake_grid.push(snake_row)
+            self.enemy_grid.push(enemy_row)
+            self.item_grid.push(item_row)
 
-        # 根据地图数据初始化各层
-        for y, row in enumerate(map_data):
-            for x, cell in enumerate(row):
-                if cell == 10:  # 不可穿透的地面
-                    self.plat_grid.set_cell(x, y, 10)
-                elif cell == 20:  # 尖刺
-                    self.plat_grid.set_cell(x, y, 20)
-                elif cell == 30:  # 蛇身体
-                    #由于蛇身的添加依赖于蛇头，所以不能在这轮进行添加
-                    #其实可以计数，然后在循环结束后添加
-                    #self.snake_grid.__add_snake_body(x, y)
-                    pass
-                elif cell == 31:  # 蛇头
-                    self.snake_grid.set_snake_head(x, y)
-                elif cell == 40:  # 敌人
-                    self.enemy_grid.set_cell(x, y, 40)
-                elif cell == 50:  # 苹果
-                    self.item_grid.set_cell(x, y, 50)
-                elif cell == 51:  # 浮空药水
-                    self.item_grid.set_cell(x, y, 51)
-                elif cell == 52:  # 无敌星星
-                    self.item_grid.set_cell(x, y, 52)
-                elif cell == 53:  # 加速药水
-                    self.item_grid.set_cell(x, y, 53)
-                elif cell == 0:  # 空白
-                    self.plat_grid.set_cell(x, y, 0)
-                    self.snake_grid.set_cell(x, y, 0)
-                    self.enemy_grid.set_cell(x, y, 0)
-                    self.item_grid.set_cell(x, y, 0)
+        self.snake_grid.init_find_snake_head() # 找到蛇头位置, 保证蛇头位置正确
+        # # 处理蛇身体部分
+        # if snake_head_pos:
+        #     # 这里添加蛇身体的逻辑
+        #     # 由于蛇身的添加依赖于蛇头，可以在这里添加逻辑
+        #     pass
