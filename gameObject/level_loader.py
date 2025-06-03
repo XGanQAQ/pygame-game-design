@@ -32,3 +32,38 @@ class LevelLoader:
         获取地图数据。
         """
         return self.map_data
+    
+    def get_map_data_reverse(self):
+        """
+        获取地图数据的逆序。
+        """
+        return self.map_data[::-1]
+
+    @staticmethod
+    def filter_row_plat(row):
+        """
+        过滤出平台层的数据。
+        """
+        return [cell if cell in [10, 20] else 0 for cell in row]
+
+    @staticmethod
+    def filter_row_snake(row):
+        """
+        过滤出蛇层的数据。
+        """
+        return [cell if cell in [31, 32, 33] else 0 for cell in row]
+
+    @staticmethod
+    def filter_row_enemy(row):
+        """
+        过滤出敌人层的数据。
+        """
+        return [cell if cell in [40, 41, 42] else 0 for cell in row]
+
+    @staticmethod
+    def filter_row_item(row):
+        """
+        过滤出物品层的数据。
+        """
+        return [cell if cell in [50, 51, 52, 53] else 0 for cell in row]
+
