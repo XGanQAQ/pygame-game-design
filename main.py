@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
         # 创建地图管理器实例
         gameMap = gameObject.game_map_manager.GameMapManager(cell_size=20)  # 创建地图管理器实例
-        gameMap.load_level("level/level_test40x40.csv")
+        gameMap.load_level("level/level_test40x40.csv", read_row_count=20)
         gameMap.set_map_scrolling(True)
         gameMap.roll_speed = 1
 

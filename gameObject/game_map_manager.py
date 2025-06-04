@@ -33,7 +33,7 @@ class GameMapManager(GameObject):
         keys = kwargs.get("keys", None)
         delta_time = kwargs.get("delta_time", 0)
         self.snake_grid.update(keys, delta_time, plat_grid=self.plat_grid, item_grid=self.item_grid, enemy_grid=self.enemy_grid)
-        self.enemy_grid.update(player_pos=(self.snake_grid.snake_head.x, self.snake_grid.snake_head.y))
+        self.enemy_grid.update(player_pos=(self.snake_grid.snake.snake_head.x, self.snake_grid.snake.snake_head.y))
         self.plat_grid.update()
         self.roll(delta_time)  # 更新滚动状态，传入delta_time
 
@@ -84,7 +84,7 @@ class GameMapManager(GameObject):
         """
         设置蛇是否允许掉落。
         """
-        self.snake_grid.is_enable_falling = is_enable_falling
+        self.snake_grid.set_snake_is_enable_falling(is_enable_falling)
         
     def set_map_scrolling(self, enable: bool):
         """
@@ -130,7 +130,7 @@ class GameMapManager(GameObject):
             self.enemy_grid.push(enemy_row)
             self.item_grid.push(item_row)
 
-        self.snake_grid.init_find_snake_head() # 找到蛇头位置, 保证蛇头位置正确
+        self.snake_grid.init_snake(self.item_grid)
         # # 处理蛇身体部分
         # if snake_head_pos:
         #     # 这里添加蛇身体的逻辑
