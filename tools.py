@@ -6,22 +6,22 @@ main_dir = os.path.split(os.path.abspath(__file__))[0]
 def load_image(file):
     """
     loads an image, prepares it for play
-    执行的路径为~/assets/images/file
-    所以直接传入文件名即可
+    执行的路径为~/assets/images/{file}
+    所以直接传入文件名{file}即可
     """
     file = os.path.join(main_dir, "assets/images", file)
     try:
         surface = pg.image.load(file)
     except pg.error:
         raise SystemExit(f'Could not load image "{file}" {pg.get_error()}')
-    return surface.convert()
+    return surface.convert_alpha()
 
 
 def load_sound(file):
     """
     because pygame can be compiled without mixer.
-    执行的路径为~/assets/musics/file
-    所以直接传入文件名即可
+    执行的路径为~/assets/musics/{file}
+    所以直接传入文件名{file}即可
     """
 
     if not pg.mixer:

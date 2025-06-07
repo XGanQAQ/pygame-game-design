@@ -1,5 +1,6 @@
 from gameObject.gridmap import Gridmap
 import pygame
+import tools
 
 class ItemGrid(Gridmap):
     """
@@ -13,7 +14,13 @@ class ItemGrid(Gridmap):
     def __init__(self, width, height, cell_size=20):
         super().__init__(width, height)
         self.cell_size = cell_size  # 单元格大小
-        self.art_assets = {} # 新增：用于存放美术资源信息
+        self.art_assets = {
+            50: tools.load_image("apple.png"),
+            51: None, # tools.load_image("float_potion.png"),
+            52: tools.load_image("invincible_star.png"),
+            53: None, # tools.load_image("speed_potion.png"),
+            54: None, # tools.load_image("win_flag.png"),
+        } # 新增：用于存放美术资源信息
         self.item_effects_config = {
             51: {'duration': 5000},  # 浮空药水: 持续时间
             52: {'duration': 5000},  # 无敌星星: 持续时间
@@ -40,15 +47,30 @@ class ItemGrid(Gridmap):
             for x in range(self.grid_width):
                 cell_value = self.get_cell(x, y)
                 if cell_value == 50:  # 苹果
-                    pygame.draw.circle(screen, (255, 0, 0), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
+                    if self.art_assets[50]:
+                        screen.blit(self.art_assets[50], (x * self.cell_size, y * self.cell_size))
+                    else:
+                        pygame.draw.circle(screen, (255, 0, 0), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
                 elif cell_value == 51:  # 浮空药水
-                    pygame.draw.circle(screen, (0, 255, 255), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
+                    if self.art_assets[51]:
+                        screen.blit(self.art_assets[51], (x * self.cell_size, y * self.cell_size))
+                    else:
+                        pygame.draw.circle(screen, (0, 255, 255), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
                 elif cell_value == 52:  # 无敌星星
-                    pygame.draw.circle(screen, (255, 255, 0), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
+                    if self.art_assets[52]:
+                        screen.blit(self.art_assets[52], (x * self.cell_size, y * self.cell_size))
+                    else:
+                        pygame.draw.circle(screen, (255, 255, 0), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
                 elif cell_value == 53:  # 加速药水
-                    pygame.draw.circle(screen, (0, 255, 0), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
+                    if self.art_assets[53]:
+                        screen.blit(self.art_assets[53], (x * self.cell_size, y * self.cell_size))
+                    else:
+                        pygame.draw.circle(screen, (0, 255, 0), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
                 elif cell_value == 54:  # 通关标志
-                    pygame.draw.circle(screen, (255, 255, 255), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
+                    if self.art_assets[54]:
+                        screen.blit(self.art_assets[54], (x * self.cell_size, y * self.cell_size))
+                    else:
+                        pygame.draw.circle(screen, (255, 255, 255), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
 
     def roll(self):
         """

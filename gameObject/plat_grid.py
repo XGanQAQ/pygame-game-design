@@ -1,6 +1,7 @@
 from gameObject.gridmap import Gridmap
 import random
 import pygame
+import tools
 
 class PlatGrid(Gridmap):
     """
@@ -14,6 +15,12 @@ class PlatGrid(Gridmap):
     def __init__(self, width, height, cell_size=20):
         super().__init__(width, height)
         self.cell_size = cell_size  # 单元格大小
+        self.art_assets = {
+            10: tools.load_image("ground.png"),
+            11: None, # tools.load_image("platform.png"),
+            12: None, # tools.load_image("moving_platform.png"),
+            20: tools.load_image("spike.png"),
+        }
 
     def update(self):
         """
@@ -36,17 +43,29 @@ class PlatGrid(Gridmap):
             for x in range(self.grid_width):
                 cell_value = self.get_cell(x, y)
                 if cell_value == 10:  # 不可穿透的地面
-                    pygame.draw.rect(screen, (139, 69, 19), (x * self.cell_size, y * self.cell_size, self.cell_size, self.cell_size))
+                    if self.art_assets[10]:
+                        screen.blit(self.art_assets[10], (x * self.cell_size, y * self.cell_size))
+                    else:
+                        pygame.draw.rect(screen, (139, 69, 19), (x * self.cell_size, y * self.cell_size, self.cell_size, self.cell_size))
                 elif cell_value == 11:  # 普通平台
-                    pygame.draw.rect(screen, (211, 211, 211), (x * self.cell_size, y * self.cell_size, self.cell_size, self.cell_size))
+                    if self.art_assets[11]:
+                        screen.blit(self.art_assets[11], (x * self.cell_size, y * self.cell_size))
+                    else:
+                        pygame.draw.rect(screen, (211, 211, 211), (x * self.cell_size, y * self.cell_size, self.cell_size, self.cell_size))
                 elif cell_value == 12:  # 移动平台
-                    pygame.draw.rect(screen, (0, 200, 200), (x * self.cell_size, y * self.cell_size, self.cell_size, self.cell_size))
+                    if self.art_assets[12]:
+                        screen.blit(self.art_assets[12], (x * self.cell_size, y * self.cell_size))
+                    else:
+                        pygame.draw.rect(screen, (0, 200, 200), (x * self.cell_size, y * self.cell_size, self.cell_size, self.cell_size))
                 elif cell_value == 20:  # 尖刺
-                    pygame.draw.polygon(screen, (255, 0, 0), [
-                        (x * self.cell_size, (y + 1) * self.cell_size),
-                        ((x + 0.5) * self.cell_size, y * self.cell_size),
-                        ((x + 1) * self.cell_size, (y + 1) * self.cell_size)
-                    ])
+                    if self.art_assets[20]:
+                        screen.blit(self.art_assets[20], (x * self.cell_size, y * self.cell_size))
+                    else:
+                        pygame.draw.polygon(screen, (255, 0, 0), [
+                            (x * self.cell_size, (y + 1) * self.cell_size),
+                            ((x + 0.5) * self.cell_size, y * self.cell_size),
+                            ((x + 1) * self.cell_size, (y + 1) * self.cell_size)
+                        ])
 
     def roll(self):
         """
