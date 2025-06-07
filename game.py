@@ -1,7 +1,9 @@
 from typing import List, Dict, Optional, Union
-import pygame
-from pygame.math import Vector2
 from blinker import Signal  # 引入 blinker 信号库
+import pygame
+import pygame_gui
+from pygame.math import Vector2
+
 
 from gameObject.player import Player
 from gameObject.snake_grid import SnakeGrid
@@ -44,7 +46,7 @@ class Game:
             print(f"无法加载图标文件 {icon_path}: {e}")
             return False
 
-    def __init__(self, screen_size: Union[tuple, Vector2] = (1600, 900)):
+    def __init__(self, screen_size: Union[tuple, Vector2] = (1600, 900), ui_manager: pygame_gui.UIManager = None):
         if not hasattr(self, "initialized"):  # 防止重复初始化
             pygame.init()
             self.screen = pygame.display.set_mode(screen_size)  # 设置窗口大小
@@ -52,6 +54,12 @@ class Game:
             self.set_window_icon()  # 设置窗口图标
             self.screen.fill("black")  # 填充背景颜色
             
+            # 初始化pygame_gui
+            if ui_manager:
+                self.manager = ui_manager
+            else:
+                self.manager = pygame_gui.UIManager(screen_size)
+
             # 背景图属性
             self.background = None
             self.background_rect = None
@@ -99,6 +107,7 @@ class Game:
                 self.signals[LifeCycle.QUIT].send(self)  # 触发退出信号
                 self.quit()
                 return  # 确保退出后不再继续执行
+            self.manager.process_events(event)
 
     def __update(self, delta_time):
         # 获取键盘输入状态
@@ -106,6 +115,7 @@ class Game:
 
         # 触发更新信号，并传递键盘输入状态和时间增量
         self.signals[LifeCycle.UPDATE].send(self, delta_time=delta_time, keys=keys)
+        self.manager.update(delta_time)
 
     def load_background(self, image_path: str):
         """
@@ -134,6 +144,8 @@ class Game:
 
         # 触发绘制信号，并传递屏幕对象
         self.signals[LifeCycle.DRAW].send(self, screen=self.screen)
+        self.manager.draw_ui(self.screen)
+        pygame.display.flip()
 
     def quit(self):
         pygame.quit()
