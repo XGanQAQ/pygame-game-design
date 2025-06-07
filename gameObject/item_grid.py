@@ -47,6 +47,8 @@ class ItemGrid(Gridmap):
                     pygame.draw.circle(screen, (255, 255, 0), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
                 elif cell_value == 53:  # 加速药水
                     pygame.draw.circle(screen, (0, 255, 0), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
+                elif cell_value == 54:  # 通关标志
+                    pygame.draw.circle(screen, (255, 255, 255), (x * self.cell_size + self.cell_size // 2, y * self.cell_size + self.cell_size // 2), self.cell_size // 3)
 
     def roll(self):
         """

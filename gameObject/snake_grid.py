@@ -35,7 +35,7 @@ class SnakeGrid(Gridmap):
         elif keys[pygame.K_DOWN]:
             self.direction = IntVector2(0, 1)
 
-        self.snake.update(delta_time, self.direction, plat_grid, item_grid, enemy_grid)
+        self.snake.update(delta_time, self.direction, self, plat_grid, item_grid, enemy_grid)
         self.__snake_map_grid(self.snake)
 
     def draw(self, screen):

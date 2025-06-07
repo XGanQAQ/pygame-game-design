@@ -12,12 +12,13 @@ class MoveStatus(Enum):
 
 class CollisionStatus(IntFlag):
     NONE = 0
-    DIE = 4
+    DIE = 4 
     GROW = 8
     FLOAT = 16 #浮空
     INVINCIBLE = 32 #无敌
     SPEED_BOOST = 64 #加速
-    GET_HURT = 128 #受伤
+    GET_HURT = 128 #受伤 
+    WIN = 256 #通关
 
 class Snake():
     def __init__(self, snake_body: deque[IntVector2], item_grid: ItemGrid):
@@ -29,6 +30,7 @@ class Snake():
         self.snake_init_signal = Signal()  # 蛇初始化信号
         self.snak_dead_signal = Signal()  # 蛇死亡信号
         self.snake_grow_signal = Signal()  # 蛇生长信号
+        self.snake_win_signal = Signal()  # 蛇通关信号
 
         # Move Speed
         self.move_speed = 300  # Speed of the snake movement
@@ -65,8 +67,8 @@ class Snake():
     def snake_tail(self):
         return self._snake_body[-1]
 
-    def update(self, delta_time, direction: IntVector2, plat_grid=None, item_grid=None, enemy_grid=None):
-        self.__check_move_status(direction, plat_grid, item_grid, enemy_grid)
+    def update(self, delta_time, direction: IntVector2, snake_grid=None, plat_grid=None, item_grid=None, enemy_grid=None):
+        self.__check_move_status(direction, snake_grid, plat_grid, item_grid, enemy_grid)
         self.__check_fall_status(plat_grid)
         self.__check_head_collision(plat_grid, item_grid, enemy_grid)
         self.__check_body_collision(plat_grid, item_grid, enemy_grid)
@@ -132,7 +134,7 @@ class Snake():
         if self.snake_move_status == MoveStatus.FALL:
             self.__fall()
 
-    def __check_move_status(self,direction: IntVector2 ,plat_grid=None, item_grid=None, enemy_grid=None):
+    def __check_move_status(self,direction: IntVector2 ,snake_grid=None ,plat_grid=None, item_grid=None, enemy_grid=None):
         next_move_pos = self.snake_head + direction
 
         # 如果没有平台网格，则报错
@@ -143,23 +145,29 @@ class Snake():
         if next_move_pos.x < 0 or next_move_pos.x >= plat_grid.grid_width or next_move_pos.y < 0 or next_move_pos.y >= plat_grid.grid_height:
             print("Cant move! Hit boundary.")
             self.snake_move_status = MoveStatus.NONE
+            return
+        
+        # 检查蛇是否调出底下
+        if next_move_pos.y >= plat_grid.grid_height:
+            print("Game Over! Hit bottom.")
+            self.snake_move_status = MoveStatus.NONE
+            self.snak_dead_signal.send(self)
+            return
 
 
         # Check self-collision
-        if plat_grid.get_cell(next_move_pos.x, next_move_pos.y) == 30:
+        if snake_grid.get_cell(next_move_pos.x, next_move_pos.y) == 30:
             print("Game Over! Self-collision.")
             self.snake_move_status = MoveStatus.NONE
-
+            return
 
         # Check platform collision
         if plat_grid:
             value = plat_grid.get_cell(next_move_pos.x, next_move_pos.y)
-            if value == 0: # Empty space
-                self.snake_move_status = MoveStatus.MOVE
-
-            elif value == 10: # Platform
+            if value == 10: # Platform
                 print("Cant move! Hit platform.")
                 self.snake_move_status = MoveStatus.NONE
+                return
 
         if item_grid:
             value = item_grid.get_cell(next_move_pos.x, next_move_pos.y)
@@ -167,6 +175,12 @@ class Snake():
                 print("Grow!")
                 # item_grid.set_cell(next_move_pos.x, next_move_pos.y, 0)
                 self.snake_collision_status |= CollisionStatus.GROW
+                return
+
+        if enemy_grid:
+            pass
+
+        self.snake_move_status = MoveStatus.MOVE
 
     def __check_fall_status(self, plat_grid=None):
         # 如果没有平台网格，则报错
@@ -224,7 +238,11 @@ class Snake():
                         self.snake_collision_status |= CollisionStatus.Die
 
             if item_grid:
-                pass
+                value = item_grid.get_cell(pos.x, pos.y)
+                if value == 54: # 通关标志
+                    print("Win!")
+                    self.snake_win_signal.send(self)
+                    item_grid.set_cell(pos.x, pos.y, 0)
 
             if enemy_grid:
                 value = enemy_grid.get_cell(pos.x, pos.y)

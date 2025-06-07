@@ -4,7 +4,7 @@ import gameObject.game_map_manager
 
 if __name__ == "__main__":
     # 创建游戏实例
-    game = Game((800.0, 900.0))  # 屏幕大小和玩家初始位置
+    game = Game((900.0, 900.0))  # 屏幕大小和玩家初始位置
 
     try:
         # 设置窗口图标和背景

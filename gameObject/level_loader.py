@@ -65,5 +65,5 @@ class LevelLoader:
         """
         过滤出物品层的数据。
         """
-        return [cell if cell in [50, 51, 52, 53] else 0 for cell in row]
+        return [cell if cell in [50, 51, 52, 53, 54] else 0 for cell in row]
 
