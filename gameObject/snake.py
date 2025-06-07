@@ -67,6 +67,10 @@ class Snake():
     def snake_tail(self):
         return self._snake_body[-1]
 
+    @property
+    def snake_length(self):
+        return len(self._snake_body)
+
     def update(self, delta_time, direction: IntVector2, snake_grid=None, plat_grid=None, item_grid=None, enemy_grid=None):
         self.__check_move_status(direction, snake_grid, plat_grid, item_grid, enemy_grid)
         self.__check_fall_status(plat_grid)

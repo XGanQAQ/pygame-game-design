@@ -111,7 +111,8 @@ class SnakeGrid(Gridmap):
         for pos in snake.snake_body:
             self.set_cell(pos.x, pos.y, 30)
         self.set_cell(snake.snake_head.x, snake.snake_head.y, 31)
-        self.set_cell(snake.snake_tail.x, snake.snake_tail.y, 32)
+        if snake.snake_length > 1:
+            self.set_cell(snake.snake_tail.x, snake.snake_tail.y, 32)
         
     def __grid_map_snake(self)->deque[IntVector2]:
         #遍历grid，找到蛇的身体
