@@ -4,16 +4,16 @@ import gameObject.game_map_manager
 
 if __name__ == "__main__":
     # 创建游戏实例
-    game = Game((900.0, 900.0))  # 屏幕大小和玩家初始位置
+    game = Game((1600.0, 900.0))  # 屏幕大小和玩家初始位置
 
     try:
         # 设置窗口图标和背景
         game.set_window_icon("assets/images/icon.png")
-        game.load_background("assets/images/back.png")
+        game.load_background("assets/images/back_all.jpg")
 
         # 创建地图管理器实例
-        gameMap = gameObject.game_map_manager.GameMapManager(cell_size=20)  # 创建地图管理器实例
-        gameMap.load_level("level/level_test40x40.csv", read_row_count=20)
+        gameMap = gameObject.game_map_manager.GameMapManager(cell_size=25, map_background=tools.load_image("back.png"))  # 创建地图管理器实例
+        gameMap.load_level("level/level_test_36x20.csv", read_row_count=20)
         gameMap.set_map_scrolling(True)
         gameMap.roll_speed = 1
 

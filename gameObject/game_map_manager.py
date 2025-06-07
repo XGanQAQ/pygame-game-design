@@ -5,21 +5,25 @@ from gameObject.enemy_grid import EnemyGrid
 from gameObject.item_grid import ItemGrid
 from gameObject.level_loader import LevelLoader
 from gameObject.game_object import GameObject
+import pygame
 
 class GameMapManager(GameObject):
     """
     统筹管理所有层级的地图，包括平台层、玩家层、敌人层、物品层。
     """
-    def __init__(self, cell_size=20):
+    def __init__(self, cell_size=20, map_background:pygame.Surface=None):
         self.cell_size = cell_size  # 单元格大小
-        self.map_data = [] # 读取的关卡数据
 
+        self.map_data = [] # 读取的关卡数据
         self.width = 0
         self.height = 0
         self.plat_grid = None  # 平台层
         self.snake_grid = None  # 玩家层
         self.enemy_grid = None  # 敌人层
         self.item_grid = None  # 物品层
+
+        self.map_screen = None # 地图屏幕
+        self.map_background = map_background # 地图背景
 
         self.is_rolling = False  # 是否正在滚动
         self.roll_total = 0  # 滚动总计数器
@@ -42,11 +46,26 @@ class GameMapManager(GameObject):
         绘制所有层级的地图。
         """
         screen = kwargs.get("screen", None)
+        
+        if self.map_screen and screen:
+            if self.map_background:
+                self.map_screen.blit(self.map_background, (0, 0))
+            else:
+                self.map_screen.fill("black")
+            self.item_grid.draw(self.map_screen)
+            self.plat_grid.draw(self.map_screen)
+            self.enemy_grid.draw(self.map_screen)
+            self.snake_grid.draw(self.map_screen)
+            screen.blit(self.map_screen, (350, 0)) # 将地图绘制到屏幕的(350, 0)位置 ，根据设计需求
+            return
+        
         if screen:
             self.plat_grid.draw(screen)
             self.item_grid.draw(screen)
             self.enemy_grid.draw(screen)
             self.snake_grid.draw(screen)
+            return
+        
 
     def roll(self, delta_time=0.0):
         """
@@ -108,6 +127,7 @@ class GameMapManager(GameObject):
 
         self.width = level_loader.width
         self.height = level_loader.height
+        self.map_screen = pygame.Surface((self.cell_size * self.width, self.cell_size * self.height))
         self.plat_grid = PlatGrid(self.width, self.height, cell_size=self.cell_size)
         self.snake_grid = SnakeGrid(self.width, self.height, cell_size=self.cell_size)
         self.enemy_grid = EnemyGrid(self.width, self.height, cell_size=self.cell_size)
