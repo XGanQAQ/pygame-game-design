@@ -23,7 +23,7 @@ class SnakeGrid(Gridmap):
         self.snake_body_image = None
         self.snake_tail_image = None
 
-        self.direction = IntVector2(1, 0)
+        self.direction = IntVector2(-1, 0)
 
     def update(self, keys, delta_time, plat_grid=None, item_grid=None, enemy_grid=None):
         if keys[pygame.K_LEFT]:

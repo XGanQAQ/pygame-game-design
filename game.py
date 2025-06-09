@@ -20,6 +20,7 @@ class LifeCycle(Enum):
     INIT = "init"  # 初始化
     UPDATE = "update"  # 更新
     EVENT = "event"  # 事件
+    DRAW_UI = "draw_ui"  # 绘制UI
     DRAW = "draw"  # 绘制
     QUIT = "quit"  # 退出
     GAME_OVER = "game_over"  # 游戏结束
@@ -69,6 +70,7 @@ class Game:
                 LifeCycle.UPDATE: Signal(),  # 每帧更新时触发
                 LifeCycle.EVENT: Signal(),  # 事件时触发
                 LifeCycle.DRAW: Signal(),    # 每帧绘制时触发
+                LifeCycle.DRAW_UI: Signal(),    # 每帧绘制UI时触发
                 LifeCycle.QUIT: Signal(),     # 退出时触发
                 LifeCycle.GAME_START: Signal(),  # 游戏开始时触发
                 LifeCycle.GAME_OVER: Signal(),  # 游戏结束时触发
@@ -99,6 +101,18 @@ class Game:
             self.signals[LifeCycle.DRAW].connect(game_object.draw)
         else:
             raise TypeError("The game_object must be an instance of GameObject.")
+
+    def addUI(self, ui_object):
+        """
+        添加UI对象，将其信号添加到游戏循环中。
+        """
+        if isinstance(ui_object, GameObject):
+            self.signals[LifeCycle.INIT].connect(ui_object.init)  # 连接初始化信号
+            self.signals[LifeCycle.UPDATE].connect(ui_object.update)
+            self.signals[LifeCycle.EVENT].connect(ui_object.event)
+            self.signals[LifeCycle.DRAW_UI].connect(ui_object.draw)
+        else:
+            raise TypeError("The ui_object must be an instance of GameObject.")
 
     def load_background(self, image_path: str):
         """
@@ -144,6 +158,9 @@ class Game:
 
         # 触发绘制信号，并传递屏幕对象
         self.signals[LifeCycle.DRAW].send(self, screen=self.screen)
+
+        # 触发绘制UI信号，并传递屏幕对象
+        self.signals[LifeCycle.DRAW_UI].send(self, screen=self.screen)
 
         pygame.display.flip()
 

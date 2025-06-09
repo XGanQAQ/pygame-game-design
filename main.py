@@ -13,8 +13,15 @@ if __name__ == "__main__":
         game.set_window_icon("assets/images/icon.png")
         game.load_background("assets/images/back_all.jpg")
 
+        # 创建实例
         # 创建地图管理器实例
         gameMap = gameObject.game_map_manager.GameMapManager(cell_size=25, map_background=tools.load_image("back.png"))  # 创建地图管理器实例
+        
+        # 添加UI
+        start_game_ui = ui.StartGameUICanvas((1600, 900), game_map_manager=gameMap)
+        game.addUI(start_game_ui)
+
+        # 加载地图
         gameMap.load_level("level/level_first_36x396.csv", read_row_count=20)
         gameMap.set_map_scrolling(True)
         gameMap.roll_speed = 1
@@ -25,12 +32,9 @@ if __name__ == "__main__":
 
         # 添加游戏开始信号
         game.signals[LifeCycle.GAME_START].connect(gameMap.set_game_start)
+        
         # 添加地图管理器
         game.addGameObject(gameMap)  # 添加地图管理器
-
-        # 添加UI
-        start_game_ui = ui.StartGameUICanvas((1600, 900), game_map_manager=gameMap)
-        game.addGameObject(start_game_ui)
 
         # 初始化游戏对象
         game.init_game_objects()
