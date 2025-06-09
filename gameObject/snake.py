@@ -108,11 +108,14 @@ class Snake():
             return
         self.move_speed_buffer %= self.move_speed_buffer_max
 
-        if not self.is_enable_fall:
+        # 如果未开启掉落，则默认移动
+        if not self.is_enable_fall and self.snake_move_status == MoveStatus.FALL:
             self.snake_move_status = MoveStatus.MOVE
         
-        if self.snake_collision_status & CollisionStatus.FLOAT:
+        # 如果有浮空效果，则默认移动
+        if self.snake_collision_status & CollisionStatus.FLOAT and self.snake_move_status == MoveStatus.FALL:
             self.snake_move_status = MoveStatus.MOVE
+
 
         if self.snake_move_status == MoveStatus.MOVE and (CollisionStatus.GROW in self.snake_collision_status):
             self.__move_grow(direction)
@@ -129,9 +132,11 @@ class Snake():
             return
         self.fall_speed_buffer %= self.fall_speed_buffer_max
 
+        # 如果未开启掉落，则跳过
         if not self.is_enable_fall:
             return
 
+        # 如果有浮空效果，则跳过
         if self.snake_collision_status & CollisionStatus.FLOAT:
             return
 
