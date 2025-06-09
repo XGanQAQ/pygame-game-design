@@ -18,7 +18,7 @@ class GameObject(ABC):
             print(f"{self.__class__.__name__} initialized.")
 
     @abstractmethod
-    def update(self, delta_time):
+    def update(self, sender, **kwargs):
         """
         Update the game object.
         This method should be overridden by subclasses.
@@ -26,7 +26,7 @@ class GameObject(ABC):
         pass
 
     @abstractmethod
-    def draw(self, screen):
+    def draw(self, sender, **kwargs):
         """
         Draw the game object on the screen.
         This method should be overridden by subclasses.
