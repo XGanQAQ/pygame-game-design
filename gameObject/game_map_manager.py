@@ -168,8 +168,3 @@ class GameMapManager(GameObject):
             self.item_grid.push(item_row)
 
         self.snake_grid.init_snake(self.item_grid)
-        # # 处理蛇身体部分
-        # if snake_head_pos:
-        #     # 这里添加蛇身体的逻辑
-        #     # 由于蛇身的添加依赖于蛇头，可以在这里添加逻辑
-        #     pass

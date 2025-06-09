@@ -33,13 +33,13 @@ class Snake():
         self.snake_win_signal = Signal()  # 蛇通关信号
 
         # Move Speed
-        self.move_speed = 300  # Speed of the snake movement
+        self.move_speed = 500  # Speed of the snake movement
         self.move_speed_buffer = 0
         self.move_speed_buffer_max = 100  # Speed buffer to control the speed of the snake
         
         # Fall Speed
         self.is_enable_fall:bool = True
-        self.fall_speed = 600  # 掉落速度
+        self.fall_speed = 500  # 掉落速度
         self.fall_speed_buffer = 0
         self.fall_speed_buffer_max = 100  # 掉落速度缓冲区最大值
         
@@ -199,7 +199,7 @@ class Snake():
 
         for segment in self.snake_body:
             value = plat_grid.get_cell(segment.x, segment.y + 1)
-            if segment.y + 1 < plat_grid.grid_height and (value == 10 or value == 11 or value == 12 or value == 20):
+            if segment.y + 1 < plat_grid.grid_height and (value == 10 or value == 11 or value == 12):
                 have_plat = True
         
         if not have_plat:
