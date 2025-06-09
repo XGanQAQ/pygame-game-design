@@ -1,3 +1,4 @@
+from locale import windows_locale
 from gameObject.int_vector2 import IntVector2
 from collections import deque
 from blinker import Signal
@@ -36,6 +37,8 @@ class Snake():
         self.move_speed = 500  # Speed of the snake movement
         self.move_speed_buffer = 0
         self.move_speed_buffer_max = 100  # Speed buffer to control the speed of the snake
+
+        self.next_move_is_wall = False
         
         # Fall Speed
         self.is_enable_fall:bool = True
@@ -108,14 +111,16 @@ class Snake():
             return
         self.move_speed_buffer %= self.move_speed_buffer_max
 
+        if self.next_move_is_wall:
+            return
+
         # 如果未开启掉落，则默认移动
-        if not self.is_enable_fall and self.snake_move_status == MoveStatus.FALL:
+        if not self.is_enable_fall:
             self.snake_move_status = MoveStatus.MOVE
         
         # 如果有浮空效果，则默认移动
-        if self.snake_collision_status & CollisionStatus.FLOAT and self.snake_move_status == MoveStatus.FALL:
+        if self.snake_collision_status & CollisionStatus.FLOAT:
             self.snake_move_status = MoveStatus.MOVE
-
 
         if self.snake_move_status == MoveStatus.MOVE and (CollisionStatus.GROW in self.snake_collision_status):
             self.__move_grow(direction)
@@ -145,6 +150,7 @@ class Snake():
 
     def __check_move_status(self,direction: IntVector2 ,snake_grid=None ,plat_grid=None, item_grid=None, enemy_grid=None):
         next_move_pos = self.snake_head + direction
+        self.next_move_is_wall = False
 
         # 如果没有平台网格，则报错
         if not plat_grid:
@@ -153,8 +159,7 @@ class Snake():
         # Check boundaries
         if next_move_pos.x < 0 or next_move_pos.x >= plat_grid.grid_width or next_move_pos.y < 0 or next_move_pos.y >= plat_grid.grid_height:
             print("Cant move! Hit boundary.")
-            self.snake_move_status = MoveStatus.NONE
-            return
+            self.next_move_is_wall = True
         
         # 检查蛇是否调出底下
         if next_move_pos.y >= plat_grid.grid_height:
@@ -163,24 +168,20 @@ class Snake():
             self.snak_dead_signal.send(self)
             return
 
-
         # Check self-collision
         if snake_grid.get_cell(next_move_pos.x, next_move_pos.y) == 30:
             print("Game Over! Self-collision.")
-            self.snake_move_status = MoveStatus.NONE
-            return
+            self.next_move_is_wall = True
 
         # Check platform collision
         if plat_grid:
             value = plat_grid.get_cell(next_move_pos.x, next_move_pos.y)
             if value == 10: # Platform
                 print("Cant move! Hit platform.")
-                self.snake_move_status = MoveStatus.NONE
-                return
+                self.next_move_is_wall = True
             elif value == 11: # Platform
                 print("Cant move! Hit platform.")
-                self.snake_move_status = MoveStatus.NONE
-                return
+                self.next_move_is_wall = True
 
         if item_grid:
             value = item_grid.get_cell(next_move_pos.x, next_move_pos.y)
@@ -188,7 +189,6 @@ class Snake():
                 print("Grow!")
                 # item_grid.set_cell(next_move_pos.x, next_move_pos.y, 0)
                 self.snake_collision_status |= CollisionStatus.GROW
-                return
 
         if enemy_grid:
             pass
