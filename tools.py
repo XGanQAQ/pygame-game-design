@@ -33,3 +33,12 @@ def load_sound(file):
     except pg.error:
         print(f"Warning, unable to load, {file}")
     return None
+
+def load_font(file: str, size: int):
+    file = os.path.join(main_dir, "assets/fonts", file)
+    try:
+        font = pg.font.Font(file, size)
+        return font
+    except pg.error:
+        print(f"Warning, unable to load, {file}")
+    return None

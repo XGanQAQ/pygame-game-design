@@ -56,11 +56,8 @@ class GameMapManager(GameObject):
         """
         处理所有层级的地图事件。
         """
-        event = kwargs.get("event", None)
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                self.is_game_start = True
-
+        pass
+    
     def draw(self, sender, **kwargs):
         """
         绘制所有层级的地图。
