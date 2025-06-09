@@ -44,14 +44,14 @@ class LevelLoader:
         """
         过滤出平台层的数据。
         """
-        return [cell if cell in [10, 20] else 0 for cell in row]
+        return [cell if cell in [10, 11, 20] else 0 for cell in row]
 
     @staticmethod
     def filter_row_snake(row):
         """
         过滤出蛇层的数据。
         """
-        return [cell if cell in [31, 32, 33] else 0 for cell in row]
+        return [cell if cell in [30, 31, 32] else 0 for cell in row]
 
     @staticmethod
     def filter_row_enemy(row):

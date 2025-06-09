@@ -172,6 +172,10 @@ class Snake():
                 print("Cant move! Hit platform.")
                 self.snake_move_status = MoveStatus.NONE
                 return
+            elif value == 11: # Platform
+                print("Cant move! Hit platform.")
+                self.snake_move_status = MoveStatus.NONE
+                return
 
         if item_grid:
             value = item_grid.get_cell(next_move_pos.x, next_move_pos.y)
@@ -237,9 +241,9 @@ class Snake():
             if plat_grid:
                 value = plat_grid.get_cell(pos.x, pos.y)
                 if value == 20: # 尖刺
-                    if not self.is_invincible_effect_active:
+                    if not self.snake_collision_status & CollisionStatus.INVINCIBLE:
                         print("Game Over! Hit 尖刺.")
-                        self.snake_collision_status |= CollisionStatus.Die
+                        self.snake_collision_status |= CollisionStatus.DIE
 
             if item_grid:
                 value = item_grid.get_cell(pos.x, pos.y)
@@ -252,9 +256,9 @@ class Snake():
                 value = enemy_grid.get_cell(pos.x, pos.y)
 
                 if value == 40:
-                    if not self.is_invincible_effect_active:
+                    if not self.snake_collision_status & CollisionStatus.INVINCIBLE:
                         print("Game Over! Hit enemy.")
-                        self.snake_collision_status |= CollisionStatus.Die
+                        self.snake_collision_status |= CollisionStatus.DIE
 
     def __move(self, direction: IntVector2):
         new_head = self.snake_head + direction

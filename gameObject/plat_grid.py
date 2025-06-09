@@ -17,8 +17,8 @@ class PlatGrid(Gridmap):
         self.cell_size = cell_size  # 单元格大小
         self.art_assets = {
             10: tools.load_image("ground.png"),
-            11: None, # tools.load_image("platform.png"),
-            12: None, # tools.load_image("moving_platform.png"),
+            11: tools.load_image("ground.png"), # TODO: 这里需要一个平台的美术资源
+            12: tools.load_image("ground.png"), # TODO: 这里需要一个移动平台的美术资源
             20: tools.load_image("spike.png"),
         }
 
