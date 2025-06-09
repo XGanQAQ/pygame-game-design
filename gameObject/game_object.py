@@ -8,7 +8,7 @@ class GameObject(ABC):
     def __init__(self):
         self.initialized = False  # 标记是否已初始化
 
-    def init(self):
+    def init(self, sender, **kwargs):
         """
         Initialize the game object.
         This method should be overridden by subclasses.
@@ -21,6 +21,14 @@ class GameObject(ABC):
     def update(self, sender, **kwargs):
         """
         Update the game object.
+        This method should be overridden by subclasses.
+        """
+        pass
+
+    @abstractmethod
+    def event(self, sender, **kwargs):
+        """
+        Handle events for the game object.
         This method should be overridden by subclasses.
         """
         pass

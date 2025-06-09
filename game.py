@@ -19,11 +19,13 @@ import tools
 class LifeCycle(Enum):
     INIT = "init"  # 初始化
     UPDATE = "update"  # 更新
+    EVENT = "event"  # 事件
     DRAW = "draw"  # 绘制
     QUIT = "quit"  # 退出
     GAME_OVER = "game_over"  # 游戏结束
     GAME_START = "game_start"  # 游戏开始
     GAME_PAUSE = "game_pause"  # 游戏暂停
+    GAME_RESUME = "game_resume"  # 游戏恢复
 
 class Game:
     _instance = None  # 用于存储单例实例
@@ -46,19 +48,13 @@ class Game:
             print(f"无法加载图标文件 {icon_path}: {e}")
             return False
 
-    def __init__(self, screen_size: Union[tuple, Vector2] = (1600, 900), ui_manager: pygame_gui.UIManager = None):
+    def __init__(self, screen_size: Union[tuple, Vector2] = (1600, 900)):
         if not hasattr(self, "initialized"):  # 防止重复初始化
             pygame.init()
             self.screen = pygame.display.set_mode(screen_size)  # 设置窗口大小
             pygame.display.set_caption("Game Window")  # 设置窗口标题
             self.set_window_icon()  # 设置窗口图标
             self.screen.fill("black")  # 填充背景颜色
-            
-            # 初始化pygame_gui
-            if ui_manager:
-                self.manager = ui_manager
-            else:
-                self.manager = pygame_gui.UIManager(screen_size)
 
             # 背景图属性
             self.background = None
@@ -71,21 +67,25 @@ class Game:
             self.signals = {
                 LifeCycle.INIT: Signal(),  # 初始化时触发
                 LifeCycle.UPDATE: Signal(),  # 每帧更新时触发
+                LifeCycle.EVENT: Signal(),  # 事件时触发
                 LifeCycle.DRAW: Signal(),    # 每帧绘制时触发
-                LifeCycle.QUIT: Signal()     # 退出时触发
+                LifeCycle.QUIT: Signal(),     # 退出时触发
+                LifeCycle.GAME_START: Signal(),  # 游戏开始时触发
+                LifeCycle.GAME_OVER: Signal(),  # 游戏结束时触发
+                LifeCycle.GAME_PAUSE: Signal(),  # 游戏暂停时触发
+                LifeCycle.GAME_RESUME: Signal(),  # 游戏恢复时触发
             }
             
-            self.initialized = True  # 标记已初始化
+            self.initialized = True  # 标记已初始化】
 
-    def __init_game_objects(self):
-        self.signals[LifeCycle.INIT].send(self)  # 触发初始化信号
+    def init_game_objects(self):
+        self.signals[LifeCycle.INIT].send(self, screen=self.screen)  # 触发初始化信号
 
     def run(self):
         while self.running:
             delta_time = self.clock.tick(60) / 1000.0  # 获取时间增量（秒）
             self.__update(delta_time)
             self.__draw()
-            pygame.display.flip()  # 更新整个屏幕的显示内容
             self.__handle_events()
 
     def addGameObject(self, game_object):
@@ -95,27 +95,10 @@ class Game:
         if isinstance(game_object, GameObject):
             self.signals[LifeCycle.INIT].connect(game_object.init)  # 连接初始化信号
             self.signals[LifeCycle.UPDATE].connect(game_object.update)
+            self.signals[LifeCycle.EVENT].connect(game_object.event)
             self.signals[LifeCycle.DRAW].connect(game_object.draw)
         else:
             raise TypeError("The game_object must be an instance of GameObject.")
-
-
-    def __handle_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:  # 点击×关闭窗口
-                self.running = False
-                self.signals[LifeCycle.QUIT].send(self)  # 触发退出信号
-                self.quit()
-                return  # 确保退出后不再继续执行
-            self.manager.process_events(event)
-
-    def __update(self, delta_time):
-        # 获取键盘输入状态
-        keys = pygame.key.get_pressed()
-
-        # 触发更新信号，并传递键盘输入状态和时间增量
-        self.signals[LifeCycle.UPDATE].send(self, delta_time=delta_time, keys=keys)
-        self.manager.update(delta_time)
 
     def load_background(self, image_path: str):
         """
@@ -134,6 +117,23 @@ class Game:
             self.background_rect = None
             return False
 
+    def __handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # 点击×关闭窗口
+                self.running = False
+                self.signals[LifeCycle.QUIT].send(self)  # 触发退出信号
+                self.quit()
+                return  # 确保退出后不再继续执行
+            self.signals[LifeCycle.EVENT].send(self, event=event)   # 触发事件信号
+            
+
+    def __update(self, delta_time):
+        # 获取键盘输入状态
+        keys = pygame.key.get_pressed()
+
+        # 触发更新信号，并传递键盘输入状态和时间增量
+        self.signals[LifeCycle.UPDATE].send(self, delta_time=delta_time, keys=keys)
+
     def __draw(self):
         # 清空屏幕
         self.screen.fill("black")
@@ -144,7 +144,7 @@ class Game:
 
         # 触发绘制信号，并传递屏幕对象
         self.signals[LifeCycle.DRAW].send(self, screen=self.screen)
-        self.manager.draw_ui(self.screen)
+
         pygame.display.flip()
 
     def quit(self):

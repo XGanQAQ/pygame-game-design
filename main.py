@@ -1,6 +1,8 @@
 from game import Game
 import tools
 import gameObject.game_map_manager
+import gameObject.ui.start_game_ui_canvas as ui
+from game import LifeCycle
 
 if __name__ == "__main__":
     # 创建游戏实例
@@ -21,8 +23,18 @@ if __name__ == "__main__":
         gameMap.set_snake_is_enable_falling(True)  # 设置蛇允许掉落
         gameMap.snake_grid.set_snake_art(tools.load_image("snake_head.png"), tools.load_image("snake_body.png"), tools.load_image("snake_tail.png"))
 
+        # 添加游戏开始信号
+        game.signals[LifeCycle.GAME_START].connect(gameMap.set_game_start)
+
         # 添加地图管理器
         game.addGameObject(gameMap)  # 添加地图管理器
+
+        # 添加UI
+        start_game_ui = ui.StartGameUICanvas((1600, 900))
+        game.addGameObject(start_game_ui)
+
+        # 初始化游戏对象
+        game.init_game_objects()
 
         # 运行游戏
         game.run()  # 运行游戏

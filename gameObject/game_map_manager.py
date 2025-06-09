@@ -12,6 +12,7 @@ class GameMapManager(GameObject):
     统筹管理所有层级的地图，包括平台层、玩家层、敌人层、物品层。
     """
     def __init__(self, cell_size=20, map_background:pygame.Surface=None):
+        super().__init__()
         self.cell_size = cell_size  # 单元格大小
 
         self.map_data = [] # 读取的关卡数据
@@ -30,16 +31,35 @@ class GameMapManager(GameObject):
         self.roll_progress = 0.0  # 滚动进度(0.0-1.0)
         self.roll_speed = 1.0  # 滚动速度(格/秒)
 
+        self.is_game_start = False
+
+    def set_game_start(self, sender):
+        self.is_game_start = True
+
+    def init(self, sender, **kwargs):
+        super().init(sender, **kwargs)
+
     def update(self, sender, **kwargs):
         """
         更新所有层级的地图状态。
         """
+        if not self.is_game_start:
+            return
         keys = kwargs.get("keys", None)
         delta_time = kwargs.get("delta_time", 0)
         self.snake_grid.update(keys, delta_time, plat_grid=self.plat_grid, item_grid=self.item_grid, enemy_grid=self.enemy_grid)
         self.enemy_grid.update(player_pos=(self.snake_grid.snake.snake_head.x, self.snake_grid.snake.snake_head.y))
         self.plat_grid.update()
         self.roll(delta_time)  # 更新滚动状态，传入delta_time
+
+    def event(self, sender, **kwargs):
+        """
+        处理所有层级的地图事件。
+        """
+        event = kwargs.get("event", None)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                self.is_game_start = True
 
     def draw(self, sender, **kwargs):
         """
