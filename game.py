@@ -167,3 +167,17 @@ class Game:
     def quit(self):
         pygame.quit()
         self.running = False  # 确保主循环不会继续运行
+
+    def game_over(self, sender):
+        self.signals[LifeCycle.GAME_OVER].send(self)  # 触发游戏结束信号
+    
+    def game_start(self, sender):
+        self.signals[LifeCycle.GAME_START].send(self)  # 触发游戏开始信号
+
+    def game_pause(self, sender):
+        self.signals[LifeCycle.GAME_PAUSE].send(self)  # 触发游戏暂停信号
+    
+    def game_resume(self, sender):
+        self.signals[LifeCycle.GAME_RESUME].send(self)  # 触发游戏恢复信号
+        
+        

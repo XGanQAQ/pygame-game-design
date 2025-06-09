@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: main.py",
+            "type": "debugpy", // 使用新的 Python 调试器
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py", // 指定 main.py 为启动入口
+            "console": "integratedTerminal", // 使用集成终端运行
+            "cwd": "${workspaceFolder}", // 设置工作目录为项目根目录
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}" // 确保 Python 模块路径正确
+            }
+        }
+    ]
+}

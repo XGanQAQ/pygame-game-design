@@ -249,6 +249,7 @@ class Snake():
                     if not self.snake_collision_status & CollisionStatus.INVINCIBLE:
                         print("Game Over! Hit 尖刺.")
                         self.snake_collision_status |= CollisionStatus.DIE
+                        self.snak_dead_signal.send(self)
 
             if item_grid:
                 value = item_grid.get_cell(pos.x, pos.y)
@@ -264,6 +265,7 @@ class Snake():
                     if not self.snake_collision_status & CollisionStatus.INVINCIBLE:
                         print("Game Over! Hit enemy.")
                         self.snake_collision_status |= CollisionStatus.DIE
+                        self.snak_dead_signal.send(self)
 
     def __move(self, direction: IntVector2):
         new_head = self.snake_head + direction

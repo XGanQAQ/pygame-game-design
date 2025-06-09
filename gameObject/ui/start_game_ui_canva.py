@@ -29,7 +29,7 @@ class StartGameUICanvas(UICanvas):
         super().event(sender, **kwargs)
         if kwargs.get("event", None).type == pygame.KEYDOWN:
             if kwargs.get("event", None).key == pygame.K_SPACE:
-                Game._instance.signals[LifeCycle.GAME_START].send(Game)
+                Game._instance.game_start(self)
                 self.begin_label.hide()
     
     def draw(self, sender, **kwargs):
