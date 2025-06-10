@@ -3,6 +3,7 @@ import tools
 import gameObject.game_map_manager
 import gameObject.ui.start_game_ui_canva
 import gameObject.ui.end_game_ui_canva
+import gameObject.ui.parse_game_ui_canva
 from game import LifeCycle
 
 if __name__ == "__main__":
@@ -40,12 +41,19 @@ if __name__ == "__main__":
         start_game_ui = gameObject.ui.start_game_ui_canva.StartGameUICanvas((1600, 900), game_map_manager=gameMap)
         game.addUI(start_game_ui)
         game.signals[LifeCycle.GAME_START].connect(start_game_ui.on_game_start)
+        game.signals[LifeCycle.GAME_PAUSE].connect(start_game_ui.on_game_pause)
         game.signals[LifeCycle.GAME_RESUME].connect(start_game_ui.on_game_resume)
 
         end_game_ui = gameObject.ui.end_game_ui_canva.EndGameUICanvas((1600, 900), game_map_manager=gameMap)
         game.addUI(end_game_ui)
         game.signals[LifeCycle.GAME_OVER].connect(end_game_ui.on_game_over)
         game.signals[LifeCycle.GAME_RESUME].connect(end_game_ui.on_game_resume)
+
+        parse_game_ui = gameObject.ui.parse_game_ui_canva.ParseGameUICanvas((1600, 900), game_map_manager=gameMap)
+        game.addUI(parse_game_ui)
+        game.signals[LifeCycle.GAME_START].connect(parse_game_ui.on_game_start)
+        game.signals[LifeCycle.GAME_PAUSE].connect(parse_game_ui.on_game_pause)
+        game.signals[LifeCycle.GAME_RESUME].connect(parse_game_ui.on_game_resume)
 
         # 初始化游戏对象
         game.init_game_objects()

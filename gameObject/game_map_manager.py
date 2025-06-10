@@ -187,6 +187,7 @@ class GameMapManager(GameObject):
 
     def on_game_start(self, sender):
         self.is_game_start = True
+        self.is_game_pause = False
 
     def on_game_pause(self, sender):
         self.is_game_pause = True
