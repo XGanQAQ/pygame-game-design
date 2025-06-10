@@ -6,12 +6,13 @@ from gameObject.item_grid import ItemGrid
 from gameObject.level_loader import LevelLoader
 from gameObject.game_object import GameObject
 import pygame
+from game import Game
 
 class GameMapManager(GameObject):
     """
     统筹管理所有层级的地图，包括平台层、玩家层、敌人层、物品层。
     """
-    def __init__(self, cell_size=20, map_background:pygame.Surface=None):
+    def __init__(self, cell_size=20, map_background:pygame.Surface=None, screen_size:tuple=None):
         super().__init__()
         self.cell_size = cell_size  # 单元格大小
 
@@ -25,6 +26,8 @@ class GameMapManager(GameObject):
 
         self.map_screen = None # 地图屏幕
         self.map_background = map_background # 地图背景
+
+        self.screen_size = screen_size # 屏幕大小
 
         self.is_rolling = False  # 是否正在滚动
         self.roll_total = 0  # 滚动总计数器
@@ -59,6 +62,8 @@ class GameMapManager(GameObject):
         self.enemy_grid.update(player_pos=(self.snake_grid.snake.snake_head.x, self.snake_grid.snake.snake_head.y))
         self.plat_grid.update()
         self.roll(delta_time)  # 更新滚动状态，传入delta_time
+
+        self.check_snake_out_screen()
 
     def event(self, sender, **kwargs):
         """
@@ -197,6 +202,11 @@ class GameMapManager(GameObject):
         # 重新加载关卡
         self.load_level(self.level_path, self.level_read_row_count)
         self.roll_total = 0
+
+    def check_snake_out_screen(self):
+        if self.snake_grid.snake.snake_head.y > self.screen_size[1]/self.cell_size:
+            Game._instance.game_over(self)
+            
 
         
         

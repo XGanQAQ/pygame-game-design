@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
         # 创建实例
         # 创建地图管理器实例
-        gameMap = gameObject.game_map_manager.GameMapManager(cell_size=25, map_background=tools.load_image("back.png"))  # 创建地图管理器实例
+        gameMap = gameObject.game_map_manager.GameMapManager(cell_size=25, map_background=tools.load_image("back.png"), screen_size=(1600, 900))  # 创建地图管理器实例
         
         # 加载地图
         gameMap.load_level("level/level_first_36x396.csv", read_row_count=20)
