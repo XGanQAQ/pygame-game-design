@@ -52,5 +52,11 @@ class EndGameUICanvas(UICanvas):
     
     def draw(self, sender, **kwargs):
         super().draw(sender, **kwargs)
+
+    def on_game_over(self, sender):
+        self.show(self)
+
+    def on_game_resume(self, sender):
+        self.hide(self)
     
     

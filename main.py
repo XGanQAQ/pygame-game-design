@@ -19,17 +19,19 @@ if __name__ == "__main__":
         gameMap = gameObject.game_map_manager.GameMapManager(cell_size=25, map_background=tools.load_image("back.png"))  # 创建地图管理器实例
         
         # 加载地图
-        gameMap.load_level("level/level_test40x40.csv", read_row_count=20)
+        gameMap.load_level("level/level_first_36x396.csv", read_row_count=20)
         gameMap.set_map_scrolling(True)
         gameMap.roll_speed = 1
 
         # 设置蛇属性
         gameMap.set_snake_is_enable_falling(True)  # 设置蛇允许掉落
-        gameMap.snake_grid.set_snake_art(tools.load_image("snake_head.png"), tools.load_image("snake_body.png"), tools.load_image("snake_tail.png"))
         gameMap.snake_grid.snake.snak_dead_signal.connect(game.game_over)
 
         # 添加游戏开始信号
-        game.signals[LifeCycle.GAME_START].connect(gameMap.set_game_start)
+        game.signals[LifeCycle.GAME_START].connect(gameMap.OnGameStart)
+        game.signals[LifeCycle.GAME_PAUSE].connect(gameMap.OnGamePause)
+        game.signals[LifeCycle.GAME_RESUME].connect(gameMap.OnGameResume)
+        game.signals[LifeCycle.GAME_OVER].connect(gameMap.OnGameOver)
         
         # 添加地图管理器
         game.addGameObject(gameMap)  # 添加地图管理器
@@ -37,8 +39,13 @@ if __name__ == "__main__":
         # 添加UI
         start_game_ui = gameObject.ui.start_game_ui_canva.StartGameUICanvas((1600, 900), game_map_manager=gameMap)
         game.addUI(start_game_ui)
+        game.signals[LifeCycle.GAME_START].connect(start_game_ui.on_game_start)
+        game.signals[LifeCycle.GAME_RESUME].connect(start_game_ui.on_game_resume)
+
         end_game_ui = gameObject.ui.end_game_ui_canva.EndGameUICanvas((1600, 900), game_map_manager=gameMap)
         game.addUI(end_game_ui)
+        game.signals[LifeCycle.GAME_OVER].connect(end_game_ui.on_game_over)
+        game.signals[LifeCycle.GAME_RESUME].connect(end_game_ui.on_game_resume)
 
         # 初始化游戏对象
         game.init_game_objects()

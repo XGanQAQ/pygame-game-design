@@ -30,9 +30,14 @@ class StartGameUICanvas(UICanvas):
         if kwargs.get("event", None).type == pygame.KEYDOWN:
             if kwargs.get("event", None).key == pygame.K_SPACE:
                 Game._instance.game_start(self)
-                self.begin_label.hide()
     
     def draw(self, sender, **kwargs):
         super().draw(sender, **kwargs)
+
+    def on_game_start(self, sender):
+        self.begin_label.hide()
+
+    def on_game_resume(self, sender):
+        self.begin_label.show()
     
     

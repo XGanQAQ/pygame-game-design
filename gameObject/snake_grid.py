@@ -8,6 +8,7 @@ from blinker import Signal  # 引入 blinker 信号库
 from collections import deque
 from gameObject.snake import Snake
 from gameObject.snake import CollisionStatus
+import tools
 import pygame
 
 
@@ -24,6 +25,8 @@ class SnakeGrid(Gridmap):
         self.snake_tail_image = None
 
         self.direction = IntVector2(-1, 0)
+
+        self.set_snake_art(tools.load_image("snake_head.png"), tools.load_image("snake_body.png"), tools.load_image("snake_tail.png"))
 
     def update(self, keys, delta_time, plat_grid=None, item_grid=None, enemy_grid=None):
         if keys[pygame.K_LEFT]:

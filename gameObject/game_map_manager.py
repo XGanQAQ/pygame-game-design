@@ -31,7 +31,13 @@ class GameMapManager(GameObject):
         self.roll_progress = 0.0  # 滚动进度(0.0-1.0)
         self.roll_speed = 1.0  # 滚动速度(格/秒)
 
+        # 游戏状态
         self.is_game_start = False
+        self.is_game_pause = False
+
+        # level state
+        self.level_path = "level/level_first_36x396.csv"
+        self.level_read_row_count = 20
 
     def set_game_start(self, sender):
         self.is_game_start = True
@@ -44,6 +50,8 @@ class GameMapManager(GameObject):
         更新所有层级的地图状态。
         """
         if not self.is_game_start:
+            return
+        if self.is_game_pause:
             return
         keys = kwargs.get("keys", None)
         delta_time = kwargs.get("delta_time", 0)
@@ -138,7 +146,10 @@ class GameMapManager(GameObject):
             file_path (str): 关卡文件路径
             read_row_count (int): 读取的行数，用于初始化地图
         """
-        level_loader = LevelLoader(file_path)
+        self.level_path = file_path
+        self.level_read_row_count = read_row_count
+
+        level_loader = LevelLoader(self.level_path)
         level_loader.load_level()
         self.map_data = level_loader.get_map_data_reverse()
 
@@ -151,7 +162,7 @@ class GameMapManager(GameObject):
         self.item_grid = ItemGrid(self.width, self.height, cell_size=self.cell_size)
         
         # 推入指定行数的数据
-        for _ in range(read_row_count):
+        for _ in range(self.level_read_row_count):
             if not self.map_data:
                 break
                 
@@ -168,3 +179,25 @@ class GameMapManager(GameObject):
             self.item_grid.push(item_row)
 
         self.snake_grid.init_snake(self.item_grid)
+
+    def OnGameStart(self, sender):
+        self.is_game_start = True
+
+    def OnGamePause(self, sender):
+        self.is_game_pause = True
+
+    def OnGameOver(self, sender):
+        self.is_game_start = False
+        self.is_game_pause = True
+
+    def OnGameResume(self, sender):
+        self.is_game_start = False
+        self.is_game_pause = False
+
+        # 重新加载关卡
+        self.load_level(self.level_path, self.level_read_row_count)
+        self.roll_total = 0
+        
+        
+
+        
