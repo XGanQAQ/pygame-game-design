@@ -180,23 +180,24 @@ class GameMapManager(GameObject):
 
         self.snake_grid.init_snake(self.item_grid)
 
-    def OnGameStart(self, sender):
+    def on_game_start(self, sender):
         self.is_game_start = True
 
-    def OnGamePause(self, sender):
+    def on_game_pause(self, sender):
         self.is_game_pause = True
 
-    def OnGameOver(self, sender):
+    def on_game_over(self, sender):
         self.is_game_start = False
         self.is_game_pause = True
 
-    def OnGameResume(self, sender):
+    def on_game_resume(self, sender):
         self.is_game_start = False
         self.is_game_pause = False
 
         # 重新加载关卡
         self.load_level(self.level_path, self.level_read_row_count)
         self.roll_total = 0
+
         
         
 

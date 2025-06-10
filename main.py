@@ -28,10 +28,10 @@ if __name__ == "__main__":
         gameMap.snake_grid.snake.snak_dead_signal.connect(game.game_over)
 
         # 添加游戏开始信号
-        game.signals[LifeCycle.GAME_START].connect(gameMap.OnGameStart)
-        game.signals[LifeCycle.GAME_PAUSE].connect(gameMap.OnGamePause)
-        game.signals[LifeCycle.GAME_RESUME].connect(gameMap.OnGameResume)
-        game.signals[LifeCycle.GAME_OVER].connect(gameMap.OnGameOver)
+        game.signals[LifeCycle.GAME_START].connect(gameMap.on_game_start)
+        game.signals[LifeCycle.GAME_PAUSE].connect(gameMap.on_game_pause)
+        game.signals[LifeCycle.GAME_RESUME].connect(gameMap.on_game_resume)
+        game.signals[LifeCycle.GAME_OVER].connect(gameMap.on_game_over)
         
         # 添加地图管理器
         game.addGameObject(gameMap)  # 添加地图管理器
