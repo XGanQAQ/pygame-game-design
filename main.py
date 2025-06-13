@@ -20,6 +20,7 @@ if __name__ == "__main__":
         
         # 加载地图
         gameMap.load_level("level/level_first_36x396_0.1.0.csv", read_row_count=20)
+        gameMap.load_map_background("back_all.jpg")
         gameMap.set_map_scrolling(True)
         gameMap.roll_speed = 1
 

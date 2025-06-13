@@ -20,6 +20,7 @@ class CollisionStatus(IntFlag):
     SPEED_BOOST = 64 #加速
     GET_HURT = 128 #受伤 
     WIN = 256 #通关
+    COLLISION = 512 #碰撞
 
 class Snake():
     def __init__(self, snake_body: deque[IntVector2], item_grid: ItemGrid):
@@ -32,6 +33,7 @@ class Snake():
         self.snak_dead_signal = Signal()  # 蛇死亡信号
         self.snake_grow_signal = Signal()  # 蛇生长信号
         self.snake_win_signal = Signal()  # 蛇通关信号
+        self.snake_state_change_signal = Signal()  # 蛇状态改变信号
 
         # Move Speed
         self.move_speed = 500  # Speed of the snake movement
@@ -81,6 +83,7 @@ class Snake():
         self.__check_body_collision(plat_grid, item_grid, enemy_grid)
         self.__update_move(delta_time, direction)
         self.__update_fall(delta_time)
+        self.__send_state_change_signal()
 
         # 更新浮空效果计时器
         if self.snake_collision_status & CollisionStatus.FLOAT:
@@ -103,7 +106,11 @@ class Snake():
                 self.snake_collision_status &= ~CollisionStatus.SPEED_BOOST
                 self.move_speed = self.original_move_speed  # 恢复原始速度
                 self.speed_boost_effect_timer = 0
-    
+                
+    def roll(self):
+        for i in range(len(self._snake_body)):
+            self._snake_body[i] += IntVector2(0, 1)
+
     def __update_move(self, delta_time, direction: IntVector2):
         # Move speed buffer 移动计时器
         if self.move_speed_buffer < self.move_speed_buffer_max:
@@ -151,6 +158,8 @@ class Snake():
     def __check_move_status(self,direction: IntVector2 ,snake_grid=None ,plat_grid=None, item_grid=None, enemy_grid=None):
         next_move_pos = self.snake_head + direction
         self.next_move_is_wall = False
+        if self.snake_collision_status & CollisionStatus.COLLISION:
+            self.snake_collision_status ^= CollisionStatus.COLLISION
 
         # 如果没有平台网格，则报错
         if not plat_grid:
@@ -160,6 +169,7 @@ class Snake():
         if next_move_pos.x < 0 or next_move_pos.x >= plat_grid.grid_width or next_move_pos.y < 0 or next_move_pos.y >= plat_grid.grid_height:
             print("Cant move! Hit boundary.")
             self.next_move_is_wall = True
+            self.snake_collision_status |= CollisionStatus.COLLISION
         
         # 检查蛇是否调出底下
         if next_move_pos.y >= plat_grid.grid_height:
@@ -172,6 +182,7 @@ class Snake():
         if snake_grid.get_cell(next_move_pos.x, next_move_pos.y) == 30:
             print("Game Over! Self-collision.")
             self.next_move_is_wall = True
+            self.snake_collision_status |= CollisionStatus.COLLISION
 
         # Check platform collision
         if plat_grid:
@@ -179,9 +190,11 @@ class Snake():
             if value == 10: # Platform
                 print("Cant move! Hit platform.")
                 self.next_move_is_wall = True
+                self.snake_collision_status |= CollisionStatus.COLLISION
             elif value == 11: # Platform
                 print("Cant move! Hit platform.")
                 self.next_move_is_wall = True
+                self.snake_collision_status |= CollisionStatus.COLLISION
 
         if item_grid:
             value = item_grid.get_cell(next_move_pos.x, next_move_pos.y)
@@ -281,7 +294,8 @@ class Snake():
         for i in range(len(self._snake_body)):
             self._snake_body[i] += IntVector2(0, 1)
 
-    def roll(self):
-        for i in range(len(self._snake_body)):
-            self._snake_body[i] += IntVector2(0, 1)
+    def __send_state_change_signal(self):
+        self.snake_state_change_signal.send(self, status=self.snake_collision_status)
+
+
         

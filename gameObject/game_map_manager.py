@@ -5,14 +5,17 @@ from gameObject.enemy_grid import EnemyGrid
 from gameObject.item_grid import ItemGrid
 from gameObject.level_loader import LevelLoader
 from gameObject.game_object import GameObject
+from gameObject.snake import CollisionStatus
+from gameObject.snake import Snake
 import pygame
+import tools
 from game import Game
 
 class GameMapManager(GameObject):
     """
     统筹管理所有层级的地图，包括平台层、玩家层、敌人层、物品层。
     """
-    def __init__(self, cell_size=20, map_background:pygame.Surface=None, screen_size:tuple=None):
+    def __init__(self, cell_size=20, map_background:pygame.Surface=None, map_gameplay:pygame.Surface=None, screen_size:tuple=None):
         super().__init__()
         self.cell_size = cell_size  # 单元格大小
 
@@ -25,7 +28,17 @@ class GameMapManager(GameObject):
         self.item_grid = None  # 物品层
 
         self.map_screen = None # 地图屏幕
-        self.map_background = map_background # 地图背景
+        self.map_background = map_background
+        self.map_gameplay = map_gameplay # 地图背景
+
+        self.map_background_dic = {
+            "normal": tools.load_image("back_all.jpg"),
+            "apple": tools.load_image("collision_apple.png"),
+            "wall": tools.load_image("collision_wall.png"),
+            "float": tools.load_image("collision_float.png"),
+            "speed": tools.load_image("collision_speed.png"),
+            "hurt": tools.load_image("collision_spike.png"),
+        }
 
         self.screen_size = screen_size # 屏幕大小
 
@@ -44,6 +57,9 @@ class GameMapManager(GameObject):
 
     def set_game_start(self, sender):
         self.is_game_start = True
+
+    def load_map_background(self, map_background_path:str):
+        self.map_background = tools.load_image(map_background_path)
 
     def init(self, sender, **kwargs):
         super().init(sender, **kwargs)
@@ -75,11 +91,14 @@ class GameMapManager(GameObject):
         """
         绘制所有层级的地图。
         """
-        screen = kwargs.get("screen", None)
+        screen:pygame.Surface = kwargs.get("screen", None)
+
         
         if self.map_screen and screen:
             if self.map_background:
-                self.map_screen.blit(self.map_background, (0, 0))
+                screen.blit(self.map_background, (0, 0))
+            if self.map_gameplay:
+                self.map_screen.blit(self.map_gameplay, (0, 0))
             else:
                 self.map_screen.fill("black")
             self.item_grid.draw(self.map_screen)
@@ -184,6 +203,7 @@ class GameMapManager(GameObject):
             self.item_grid.push(item_row)
 
         self.snake_grid.init_snake(self.item_grid)
+        self.snake_grid.snake.snake_state_change_signal.connect(self.on_snake_state_change)
 
     def on_game_start(self, sender):
         self.is_game_start = True
@@ -203,6 +223,22 @@ class GameMapManager(GameObject):
         # 重新加载关卡
         self.load_level(self.level_path, self.level_read_row_count)
         self.roll_total = 0
+
+    def on_snake_state_change(self, sender, **kwargs):
+        """
+        处理蛇状态变化事件。
+        """
+        state = kwargs.get("status", None)
+        if state & CollisionStatus.GET_HURT:
+            self.map_background = self.map_background_dic.get("hurt")
+        elif state & CollisionStatus.COLLISION:
+            self.map_background = self.map_background_dic.get("wall")
+        elif state & CollisionStatus.GROW:
+            self.map_background = self.map_background_dic.get("apple")
+        elif state & CollisionStatus.FLOAT:
+            self.map_background = self.map_background_dic.get("float")
+        elif state & CollisionStatus.SPEED_BOOST:
+            self.map_background = self.map_background_dic.get("speed")
 
     def check_snake_out_screen(self):
         if self.snake_grid.snake.snake_head.y > self.screen_size[1]/self.cell_size:
