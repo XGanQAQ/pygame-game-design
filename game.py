@@ -57,10 +57,6 @@ class Game:
             self.set_window_icon()  # 设置窗口图标
             self.screen.fill("black")  # 填充背景颜色
 
-            # 背景图属性
-            self.background = None
-            self.background_rect = None
-
             self.clock = pygame.time.Clock()
             self.running = True
 
@@ -114,23 +110,6 @@ class Game:
         else:
             raise TypeError("The ui_object must be an instance of GameObject.")
 
-    def load_background(self, image_path: str):
-        """
-        加载游戏背景图
-        :param image_path: 背景图片的路径
-        """
-        try:
-            self.background = pygame.image.load(image_path).convert()
-            # 缩放背景图以匹配屏幕大小
-            self.background = pygame.transform.scale(self.background, self.screen.get_size())
-            self.background_rect = self.background.get_rect()
-            return True
-        except pygame.error as e:
-            print(f"无法加载背景图片 {image_path}: {e}")
-            self.background = None
-            self.background_rect = None
-            return False
-
     def __handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # 点击×关闭窗口
@@ -151,10 +130,6 @@ class Game:
     def __draw(self):
         # 清空屏幕
         self.screen.fill("black")
-        
-        # 绘制背景图（如果已加载）
-        if self.background:
-            self.screen.blit(self.background, self.background_rect)
 
         # 触发绘制信号，并传递屏幕对象
         self.signals[LifeCycle.DRAW].send(self, screen=self.screen)
