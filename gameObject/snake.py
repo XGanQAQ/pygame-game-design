@@ -30,8 +30,9 @@ class Snake():
 
         # Singnal
         self.snake_init_signal = Signal()  # 蛇初始化信号
-        self.snak_dead_signal = Signal()  # 蛇死亡信号
+        self.snake_get_hurt_signal = Signal()  # 蛇受伤信号
         self.snake_grow_signal = Signal()  # 蛇生长信号
+        self.snak_dead_signal = Signal()  # 蛇死亡信号
         self.snake_win_signal = Signal()  # 蛇通关信号
         self.snake_state_change_signal = Signal()  # 蛇状态改变信号
 
@@ -57,6 +58,10 @@ class Snake():
         # Speed boost effect
         self.speed_boost_effect_timer = 0  # 加速效果计时器
         self.original_move_speed = self.move_speed # 存储原始移动速度
+
+        # 受伤计时器
+        self.get_hurt_timer = 0
+        self.get_hurt_gap_time = 1500 #ms
 
         self.item_config = item_grid.item_effects_config
 
@@ -106,6 +111,13 @@ class Snake():
                 self.snake_collision_status &= ~CollisionStatus.SPEED_BOOST
                 self.move_speed = self.original_move_speed  # 恢复原始速度
                 self.speed_boost_effect_timer = 0
+
+        # 更新受伤计时器
+        if self.snake_collision_status & CollisionStatus.GET_HURT:
+            self.get_hurt_timer -= delta_time * 1000  # delta_time 是秒，转换为毫秒
+            if self.get_hurt_timer <= 0:
+                self.snake_collision_status &= ~CollisionStatus.GET_HURT
+                self.get_hurt_timer = 0
                 
     def roll(self):
         for i in range(len(self._snake_body)):
@@ -260,9 +272,9 @@ class Snake():
                 value = plat_grid.get_cell(pos.x, pos.y)
                 if value == 20: # 尖刺
                     if not self.snake_collision_status & CollisionStatus.INVINCIBLE:
-                        print("Game Over! Hit 尖刺.")
-                        self.snake_collision_status |= CollisionStatus.DIE
-                        self.snak_dead_signal.send(self)
+                        print("Hit 尖刺！！！")
+                        self.__collision_hurt()
+                        return
 
             if item_grid:
                 value = item_grid.get_cell(pos.x, pos.y)
@@ -296,6 +308,21 @@ class Snake():
 
     def __send_state_change_signal(self):
         self.snake_state_change_signal.send(self, status=self.snake_collision_status)
+
+    def __collision_hurt(self):
+        if self.get_hurt_timer > 0:
+            return
+
+        print("Snake get hurt!")
+        if self.snake_length > 1:
+            self.snake_body.pop()
+            self.get_hurt_timer = self.get_hurt_gap_time #ms
+            self.snake_collision_status |= CollisionStatus.GET_HURT
+            self.snake_get_hurt_signal.send(self)
+        else:
+            print("Snake dead!")
+            self.snake_collision_status |= CollisionStatus.DIE
+            self.snak_dead_signal.send(self)
 
 
         
