@@ -29,26 +29,30 @@ class SnakeGrid(Gridmap):
         self.set_snake_art(tools.load_image("snake_head.png"), tools.load_image("snake_body.png"), tools.load_image("snake_tail.png"))
 
         self.on_snake_get_hurt_animation_timer = 0
-        self.on_snake_get_hurt_animation_duration = 0.2 * 1000  # 动画持续时间: 默认 0.2秒，在后面会被初始化的和蛇的受伤间隔时间一致
+        self.on_snake_get_hurt_animation_duration = 0.2  # 动画持续时间: 默认 0.2秒，在后面会被初始化的和蛇的受伤间隔时间一致
         self.is_snake_get_hurt_animation_end = False
-
+    
+    def event(self, event):
+        """
+        Handle events for the snake grid
+        """
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                self.direction = IntVector2(-1, 0)
+            elif event.key == pygame.K_RIGHT:
+                self.direction = IntVector2(1, 0)
+            elif event.key == pygame.K_UP:
+                self.direction = IntVector2(0, -1)
+            elif event.key == pygame.K_DOWN:
+                self.direction = IntVector2(0, 1)
 
     def update(self, keys, delta_time, plat_grid=None, item_grid=None, enemy_grid=None):
-        if keys[pygame.K_LEFT]:
-            self.direction = IntVector2(-1, 0)
-        elif keys[pygame.K_RIGHT]:
-            self.direction = IntVector2(1, 0)
-        elif keys[pygame.K_UP]:
-            self.direction = IntVector2(0, -1)
-        elif keys[pygame.K_DOWN]:
-            self.direction = IntVector2(0, 1)
-
         self.snake.update(delta_time, self.direction, self, plat_grid, item_grid, enemy_grid)
         self.__snake_map_grid(self.snake)
 
         # 蛇受伤动画计时器
         if self.on_snake_get_hurt_animation_timer:
-            self.on_snake_get_hurt_animation_timer -= delta_time * 1000  # delta_time 是秒，转换为毫秒
+            self.on_snake_get_hurt_animation_timer -= delta_time  # delta_time 是秒，转换为毫秒
             if self.on_snake_get_hurt_animation_timer <= 0:
                 self.on_snake_get_hurt_animation_timer = 0
                 self.is_snake_get_hurt_animation_end = True
@@ -83,6 +87,7 @@ class SnakeGrid(Gridmap):
         
     def roll(self):
         self.snake.roll()
+        self.__snake_map_grid(self.snake)
 
     def init_snake(self, item_grid):
         self.snake = Snake(self.__grid_map_snake(), item_grid)

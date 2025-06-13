@@ -22,10 +22,10 @@ class GameMapManager(GameObject):
         self.map_data = [] # 读取的关卡数据
         self.width = 0
         self.height = 0
-        self.plat_grid = None  # 平台层
-        self.snake_grid = None  # 玩家层
-        self.enemy_grid = None  # 敌人层
-        self.item_grid = None  # 物品层
+        self.plat_grid:PlatGrid = None  # 平台层
+        self.snake_grid:SnakeGrid = None  # 玩家层
+        self.enemy_grid:EnemyGrid = None  # 敌人层
+        self.item_grid:ItemGrid = None  # 物品层
 
         self.map_screen = None # 地图屏幕
         self.map_background = map_background
@@ -75,7 +75,7 @@ class GameMapManager(GameObject):
         keys = kwargs.get("keys", None)
         delta_time = kwargs.get("delta_time", 0)
         self.snake_grid.update(keys, delta_time, plat_grid=self.plat_grid, item_grid=self.item_grid, enemy_grid=self.enemy_grid)
-        self.enemy_grid.update(player_pos=(self.snake_grid.snake.snake_head.x, self.snake_grid.snake.snake_head.y))
+        # self.enemy_grid.update(player_pos=(self.snake_grid.snake.snake_head.x, self.snake_grid.snake.snake_head.y))
         self.plat_grid.update()
         self.roll(delta_time)  # 更新滚动状态，传入delta_time
 
@@ -85,6 +85,9 @@ class GameMapManager(GameObject):
         """
         处理所有层级的地图事件。
         """
+        
+        self.snake_grid.event(kwargs.get("event", None))
+
         pass
     
     def draw(self, sender, **kwargs):
