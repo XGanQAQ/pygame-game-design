@@ -16,9 +16,9 @@ class ItemGrid(Gridmap):
         self.cell_size = cell_size  # 单元格大小
         self.art_assets = {
             50: tools.load_image("apple.png"),
-            51: None, # tools.load_image("float_potion.png"),
+            51: tools.load_image("float_potion.png"),
             52: tools.load_image("invincible_star.png"),
-            53: None, # tools.load_image("speed_potion.png"),
+            53: tools.load_image("speed_potion.png"),
             54: None, # tools.load_image("win_flag.png"),
         } # 新增：用于存放美术资源信息
         self.item_effects_config = {
