@@ -55,11 +55,7 @@ class SnakeGrid(Gridmap):
             self.on_snake_get_hurt_animation_timer -= delta_time  # delta_time 是秒，转换为毫秒
             if self.on_snake_get_hurt_animation_timer <= 0:
                 self.on_snake_get_hurt_animation_timer = 0
-                self.is_snake_get_hurt_animation_end = True
-
-        if self.is_snake_get_hurt_animation_end:
-            self.on_snake_get_hurt_animation_end(self.snake)
-            self.is_snake_get_hurt_animation_end = False
+                self.on_snake_get_hurt_animation_end(self.snake)
 
     def draw(self, screen):
         """
@@ -92,7 +88,7 @@ class SnakeGrid(Gridmap):
     def init_snake(self, item_grid):
         self.snake = Snake(self.__grid_map_snake(), item_grid)
         self.snake.snake_get_hurt_signal.connect(self.on_snake_get_hurt_animation_begin)
-        self.on_snake_get_hurt_animation_duration = self.snake.get_hurt_gap_time
+        self.on_snake_get_hurt_animation_duration = self.snake.get_hurt_gap_time / 1000
 
     def set_snake_is_enable_falling(self, is_enable: bool):
         self.snake.is_enable_fall = is_enable
