@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     try:
         # 设置窗口图标和背景
-        game.set_window_icon("assets/images/icon.png")
+        game.set_window_icon(tools.load_image("icon.png"))
 
         # 创建实例
         # 创建地图管理器实例

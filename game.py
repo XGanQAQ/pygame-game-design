@@ -36,17 +36,16 @@ class Game:
             cls._instance = super(Game, cls).__new__(cls)
         return cls._instance
 
-    def set_window_icon(self, icon_path: str = "assets/images/icon.png"):
+    def set_window_icon(self, icon):
         """
         设置窗口图标
         :param icon_path: 图标文件路径
         """
         try:
-            icon = pygame.image.load(icon_path)
             pygame.display.set_icon(icon)
             return True
         except pygame.error as e:
-            print(f"无法加载图标文件 {icon_path}: {e}")
+            print(f"无法加载图标文件 {icon}: {e}")
             return False
 
     def __init__(self, screen_size: Union[tuple, Vector2] = (1600, 900)):
@@ -54,7 +53,6 @@ class Game:
             pygame.init()
             self.screen = pygame.display.set_mode(screen_size)  # 设置窗口大小
             pygame.display.set_caption("Game Window")  # 设置窗口标题
-            self.set_window_icon()  # 设置窗口图标
             self.screen.fill("black")  # 填充背景颜色
 
             self.clock = pygame.time.Clock()
