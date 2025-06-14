@@ -5,6 +5,7 @@ from blinker import Signal
 from enum import IntFlag
 from enum import Enum
 from gameObject.item_grid import ItemGrid
+from gameObject.audio_manager import AudioManager
 
 class MoveStatus(Enum):
     NONE = 0
@@ -246,6 +247,7 @@ class Snake():
 
             if value == 50: # Apple
                 item_grid.set_cell(head_pos.x, head_pos.y, 0)
+                self.__trigger_snake_eat_apple_music_effect()
                 pass
             elif value == 51: # Float potion
                 item_grid.set_cell(head_pos.x, head_pos.y, 0) # 移除药水
@@ -323,6 +325,9 @@ class Snake():
             print("Snake dead!")
             self.snake_collision_status |= CollisionStatus.DIE
             self.snak_dead_signal.send(self)
+
+    def __trigger_snake_eat_apple_music_effect(self):
+        AudioManager._instance.playEffect("eat_apple_effect")
 
 
         

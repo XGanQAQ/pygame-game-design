@@ -24,14 +24,14 @@ def main():
     audio.signals["effect_playing"].connect(on_effect_playing)
 
     # 播放 testBgm.flac
-    audio.playMusic("testBgm")
+    audio.playMusic("maou_bgm_8bit27")
 
     time.sleep(5)  # 播放 5 秒
 
     # 停止播放音乐，播放 testPianoEffect.mp3
     print("停止播放音乐")
     audio.stop_music()
-    audio.playEffect("testPianoEffect")
+    audio.playEffect("eat_apple_effect")
 
     time.sleep(5)
 

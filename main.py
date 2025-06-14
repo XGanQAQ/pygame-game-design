@@ -4,11 +4,13 @@ import gameObject.game_map_manager
 import gameObject.ui.start_game_ui_canva
 import gameObject.ui.end_game_ui_canva
 import gameObject.ui.parse_game_ui_canva
+from gameObject.audio_manager import AudioManager
 from game import LifeCycle
 
 if __name__ == "__main__":
     # 创建游戏实例
     game = Game((1600.0, 900.0))  # 屏幕大小和玩家初始位置
+    audio = AudioManager()
 
     try:
         # 设置窗口图标和背景
@@ -57,6 +59,9 @@ if __name__ == "__main__":
 
         # 初始化游戏对象
         game.init_game_objects()
+
+        audio.playMusic("maou_bgm_8bit27")
+
 
         # 运行游戏
         game.run()  # 运行游戏

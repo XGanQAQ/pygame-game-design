@@ -21,7 +21,7 @@ class AudioManager:
         pg.mixer.init()
 
         self.effects = load_effects(effectPath, "mp3")
-        self.bgms = load_bgms(musicPath, "flac")
+        self.bgms = load_bgms(musicPath, "ogg")
         # load_playList
 
         self.signals = {
